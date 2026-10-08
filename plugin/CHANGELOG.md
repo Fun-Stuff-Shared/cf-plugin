@@ -2,6 +2,12 @@
 
 Every release has a new version in `plugin/.claude-plugin/plugin.json`. Claude Code ignores new commits under an unchanged version, so a change with no bump never reaches anyone. The Build line under each heading is written by `npm run build:plugin`.
 
+## 0.8.1 - 2026-10-08
+
+Build: dist sha256 bba2964af68ceb2a66e0313d509831991ca30770d5ddf715bd73f0f9beee023b; skills sha256 206d0c6c0519aea2758ca56f3d69836b66eeec74eac555f4eeb23f6d936cfd94
+
+Setting up now says what to do after your Foundation: open the Extraction Room, paste your CF service key under Find Your Roots, then add and choose your calls. Your CF folder is Documents/CF unless you set another one, and setting up no longer mixes up other settings with the folder.
+
 ## 0.8.0 - 2026-10-08
 
 Build: dist sha256 21bae31342378341ed59a68f7db00625fd12cb44cc7e059080530ca6b8996d86; skills sha256 47aa448817c9b460fda14a90efc04449c15f64657747da040366e0f382804d33

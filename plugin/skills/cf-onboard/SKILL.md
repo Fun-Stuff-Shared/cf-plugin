@@ -1,11 +1,11 @@
 ---
 name: cf-onboard
-description: Set up a new person's Cognitive Fingerprint. Opens their dashboard, which makes the CF folder on first run and walks them through everything else in the browser - their name, ten short questions, and adding their calls. Safe to run again. Use when someone says "set up my CF", "start my CF", or "onboard me".
+description: Set up a new person's Cognitive Fingerprint. Opens their dashboard, which makes the CF folder on first run and walks them through the rest in the browser: their name, ten short questions, connecting with their CF service key, and adding their calls. Safe to run again. Use when someone says "set up my CF", "start my CF", or "onboard me".
 ---
 
 # CF Onboard
 
-Setup happens in the dashboard, not here. Your job is to open it and get out of the way. Version: `cf-onboard@0.4.0`.
+Setup happens in the dashboard, not here. Your job is to open it and get out of the way. Version: `cf-onboard@0.5.0`.
 
 The `cf` command is the plugin's bundled CLI: `node ${CLAUDE_PLUGIN_ROOT}/dist/cf.mjs`. The person's CF folder is `${user_config.cf_folder}`. Call it FOLDER below and always put it in double quotes.
 
@@ -24,11 +24,17 @@ Then send this message, as written:
 
 > Your dashboard just opened in your browser. Switch to it now. You can close this window.
 >
-> Everything from here happens there. Follow Next Up at the top of the page: it asks your name, then ten short questions, then for 3 to 5 recorded calls. It shows one thing at a time and tells you when you're done.
+> Everything from here happens there:
+>
+> 1. Start with Your Foundation in the sidebar: your name, then ten short questions.
+> 2. Open the Extraction Room. Under Find Your Roots, paste the CF service key you were given and press Connect.
+> 3. Add 3 to 5 recorded calls, choose them, and press Find Your Roots.
 >
 > No new tab in your browser? Say "open it again" here before you close this window.
 
 If they say "open it again", run the same open command once more and send only the first line of the message. The sign-in link works once, for 60 seconds, so never give them the address instead. If they come back another day, they say "open my CF dashboard".
+
+If they ask where the key goes, it is step 2: the Extraction Room, under Find Your Roots. Never ask them to paste the key here, and if they do, tell them to paste it in the dashboard instead and not to share it in chat.
 
 If they would rather answer the ten questions here, run the `cf-starting-point` skill. Its draft shows up in the dashboard for them to save.
 

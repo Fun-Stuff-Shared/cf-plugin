@@ -7375,7 +7375,11 @@ import { join } from "node:path";
 var defaultCfFolder = (home = homedir()) => join(home, "Documents", "CF");
 var UNSET = /^(|\$\{user_config\.cf_folder\})$/;
 function withDefaultFolder(argv, home) {
-  return argv.map((arg) => UNSET.test(arg.trim()) ? defaultCfFolder(home) : arg);
+  return argv.map((arg, i) => {
+    const before = argv[i - 1];
+    const folderSlot = before === void 0 || before === "--cf" || !before.startsWith("--");
+    return folderSlot && UNSET.test(arg.trim()) ? defaultCfFolder(home) : arg;
+  });
 }
 
 // src/mcp/main.ts
