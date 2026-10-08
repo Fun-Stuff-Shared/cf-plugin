@@ -1,5 +1,7 @@
 # Install Guide
 
+**On a Mac, use the Cognitive Fingerprint app instead of this plugin.** It is the dashboard in its own window, it keeps itself up to date, and a small companion plugin connects it to your AI agents. Download it and follow its guide at [github.com/Fun-Stuff-Shared/cf-mac](https://github.com/Fun-Stuff-Shared/cf-mac). The rest of this page is the plugin, which runs the same dashboard from Claude Code.
+
 This guide is for a Cognitive Fingerprint Lab member. You do not need to code. Plan on 15 minutes.
 
 This is the play version: an early build for Lab members to try and report on. Expect rough edges, and use Feedback in the dashboard sidebar to tell Max about them.
