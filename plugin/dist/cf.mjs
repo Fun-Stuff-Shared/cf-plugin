@@ -48552,13 +48552,13 @@ function checkLayers(item, ctx) {
     if (item.layer_text?.[`l${n}`] !== void 0 && item.layers < n) ctx.addIssue({ code: "custom", path: ["layer_text", `l${n}`], message: `layer ${n} text needs layers of ${n} or more` });
   }
 }
-function checkSet(items, ctx, counted, max = ITEM_MAX) {
+function checkSet(items, ctx, meetings, max = ITEM_MAX) {
   if (new Set(items.map((item) => item.id)).size !== items.length) ctx.addIssue({ code: "custom", message: "an item id appears twice" });
   if (items.length > max) ctx.addIssue({ code: "custom", message: `more than ${max} items` });
-  if (counted) {
+  if (meetings !== null) {
     for (const kind2 of KINDS) {
       const n = items.filter((item) => item.kind === kind2).length;
-      const { min, max: max2 } = KIND_COUNT[kind2];
+      const { min, max: max2 } = kind2 === "root" ? rootRange(meetings) : KIND_COUNT[kind2];
       if (n < min || n > max2) ctx.addIssue({ code: "custom", message: `expected ${min} to ${max2} items of kind ${kind2}, got ${n}` });
     }
   }
@@ -48577,7 +48577,7 @@ function checkServerMessage(value) {
   if (!schema || type === "call" && !Object.hasOwn(CallSchemas, String(tool))) throw new Error(`server message refused: ${type === "call" ? `no tool ${String(tool)}` : `unexpected message ${String(type)}`}`);
   return parse6(schema, value, "server message refused");
 }
-var SEARCH_LIMIT, MAX_LIMIT, MAX_CONTEXT, KINDS, KIND_COUNT, ITEM_MAX, STATES, KIND_STATES, DIMENSIONS, ITEM_DIMENSIONS, BEHAVIOUR_COUNT, SITUATION_COUNT, STEP_COUNT, CONTROL, ITEM_ID, PROTOCOL, ROOTS_PATH, OUT_OF_DATE, TOOLS, utf8Bytes, UPDATE, text, PLAIN_PATTERN, TO_PERSON_PATTERN, AGENT_WORDS, PLAIN, line, plain, whole, MeetingSchema, SourceSchema, MeetingEntrySchema, MomentSchema, SpokenSchema, exchange, MomentHitSchema, TurnHitSchema, ContextSchema, meetingIds, SearchArgsSchema, SampleArgsSchema, ContextArgsSchema, sizes, list, LayerTextSchema, MakeIdeaSchema, itemId, common, expresses, StepSchema, RootFieldsSchema, PatternFieldsSchema, BlindSpotFieldsSchema, FrameworkFieldsSchema, RootDraft, PatternDraft, BlindSpotDraft, FrameworkDraft, ProposalSchema, OpportunitySchema, RefSchema, ControlSchema, MeasureSchema, tested, ItemSchema, ProposalsSchema, ItemsSchema, reason, OpSchema, EvidenceUpdateSchema, UpdateResultSchema, JudgeReportSchema, RunReportSchema, held, ExistingSchema, ExistingListSchema, start, DiscoverStart, UpdateStart, StartSchema, ReplySchema, CallSchemas, ServerSchemas, DeviceMessageSchema, ServerMessageSchema, SampleSchema, ToolResultSchemas, WhySchema, checkItem, checkItems, checkUpdateResult, checkRunReport, kind;
+var SEARCH_LIMIT, MAX_LIMIT, MAX_CONTEXT, KINDS, KIND_COUNT, ITEM_MAX, STATES, KIND_STATES, DIMENSIONS, ITEM_DIMENSIONS, BEHAVIOUR_COUNT, SITUATION_COUNT, STEP_COUNT, CONTROL, ITEM_ID, PROTOCOL, ROOTS_PATH, OUT_OF_DATE, TOOLS, utf8Bytes, UPDATE, text, CONTROL_CHARS, FORBIDDEN_CHARS, URL_LIKE, PLAIN_CHARS, PLAIN_PATTERN, TO_PERSON_PATTERN, AGENT_PHRASES, AGENT_PATTERNS, addressesAgent, PLAIN, line, plain, whole, MeetingSchema, SourceSchema, MeetingEntrySchema, MomentSchema, SpokenSchema, exchange, MomentHitSchema, TurnHitSchema, ContextSchema, meetingIds, SearchArgsSchema, SampleArgsSchema, ContextArgsSchema, sizes, list, LayerTextSchema, MakeIdeaSchema, itemId, common, expresses, StepSchema, RootFieldsSchema, PatternFieldsSchema, BlindSpotFieldsSchema, FrameworkFieldsSchema, RootDraft, PatternDraft, BlindSpotDraft, FrameworkDraft, ProposalSchema, OpportunitySchema, RefSchema, ControlSchema, MeasureSchema, tested, ItemSchema, mostlyOpposite, MEETINGS_PER_ROOT, rootRange, ItemsSchema, reason, OpSchema, EvidenceUpdateSchema, UpdateResultSchema, JudgeReportSchema, RunReportSchema, held, ExistingSchema, ExistingListSchema, start, DiscoverStart, UpdateStart, StartSchema, ReplySchema, CallSchemas, ServerSchemas, DeviceMessageSchema, ServerMessageSchema, SampleSchema, ToolResultSchemas, WhySchema, checkItem, checkItems, checkUpdateResult, checkRunReport, kind;
 var init_src = __esm({
   "../../packages/cf-contract/src/index.ts"() {
     "use strict";
@@ -48604,12 +48604,51 @@ var init_src = __esm({
     utf8Bytes = (text3) => new TextEncoder().encode(text3).length;
     UPDATE = { existing: 30, existingBytes: 6e4, results: 12, new: 6, splitParts: 3 };
     text = external_exports2.string().trim().min(1);
-    PLAIN_PATTERN = "^[^|`<>\\[\\]{}\\n\\r]*$";
-    TO_PERSON_PATTERN = "^You\\b[^|`<>\\[\\]{}\\n\\r]*$";
-    AGENT_WORDS = ["ignore previous", "ignore all", "ignore the above", "disregard", "system prompt", "you must", "you should", "as an ai", "assistant:", "<|"];
+    CONTROL_CHARS = /[\u0000-\u001f\u007f-\u009f\u2028\u2029]/;
+    FORBIDDEN_CHARS = /[|`<>[\]{}]/;
+    URL_LIKE = /(https?:\/\/|www\.)/i;
+    PLAIN_CHARS = "[^|`<>\\[\\]{}\\u0000-\\u001f\\u007f-\\u009f\\u2028\\u2029]";
+    PLAIN_PATTERN = `^${PLAIN_CHARS}*$`;
+    TO_PERSON_PATTERN = `^You\\b${PLAIN_CHARS}*$`;
+    AGENT_PHRASES = [
+      "ignore previous",
+      "ignore all",
+      "ignore the above",
+      "disregard",
+      "system prompt",
+      "you must",
+      "you should",
+      "you need to",
+      "you have to",
+      "as an ai",
+      "assistant:",
+      "<|"
+    ];
+    AGENT_PATTERNS = [
+      // ignore / disregard / override ... the instructions, rules, or sources
+      /\b(ignore|disregard|override|bypass)\b[^.\n]{0,40}\b(instructions?|rules|guidelines?|prompts?|previous|prior|earlier|above|system|sources?|source items|safeguards?|restrictions?)\b/i,
+      /\bforget (everything|all)\b[^.\n]{0,25}\b(you|told|said|above|earlier|before)\b/i,
+      // a role or system marker at the start of a line
+      /(^|\n)\s*(system|assistant|developer)\s*:/i,
+      /(^|\s)(<\||\[inst\]|###\s*(system|instruction))/i,
+      // talking to the AI
+      /\b(you are (now|no longer)|you are an? (ai|assistant|agent|model|language model|chatbot|unrestricted|unfiltered)|act as an? (unrestricted|unfiltered|ai assistant|ai model|chatbot|language model)|pretend (to be|you)|new instructions?|jailbreak)\b/i,
+      /\bfrom now on,?\s+(always\s+|only\s+)?(answer|respond|reply|write|speak|say)\b/i,
+      /^\s*(hey |hi |dear )?(assistant|chatgpt|claude|llm|ai)\s*[,:]/i,
+      // a standing rule for whoever is drafting
+      /\bwhen (you )?(drafting|writing|generating|replying|responding|making|creating|summari[sz]ing|answering)\b[^.\n]{0,30},?\s*(always|never|do not|don't|ignore|only|use|include|add|skip|mention|say)\b/i,
+      // hiding things from the person, or printing secrets
+      /\b(do not|don't|never)\s+(tell|mention|reveal|show|inform)\s+(the\s+)?(person|user|owner|reader)\b/i,
+      /\b(print|reveal|output|repeat|show|leak)\b[^.\n]{0,30}\b(system prompt|your instructions|the token|api key|secret|password)\b/i,
+      // the app's own tool names, and paths inside the CF folder
+      /\bcf_[a-z_]{4,}\b/i,
+      /\b(fingerprint|workshop)\/[\w.-]/i,
+      /\.\.\//
+    ];
+    addressesAgent = (value) => AGENT_PHRASES.some((phrase) => value.toLowerCase().includes(phrase)) || AGENT_PATTERNS.some((re) => re.test(value));
     PLAIN = { name: { min: 3, max: 80 }, alias: { min: 2, max: 60 }, summary: { min: 10, max: 240 }, why: { min: 5, max: 240 }, layer: { min: 5, max: 240 }, idea: { min: 10, max: 140 }, step: { min: 5, max: 120 }, root: { min: 10, max: 1200 }, situation: { min: 3, max: 300 }, condition: { min: 3, max: 400 } };
-    line = ({ min, max }) => external_exports2.string().trim().min(min, `shorter than ${min} characters`).max(max, `longer than ${max} characters`).regex(new RegExp(PLAIN_PATTERN), "not one line of plain text").refine((value) => !/https?:\/\/|www\./i.test(value), "has a web address");
-    plain = (limits) => line(limits).refine((value) => !AGENT_WORDS.some((words3) => value.toLowerCase().includes(words3)), "addresses an agent");
+    line = ({ min, max }) => external_exports2.string().trim().min(min, `shorter than ${min} characters`).max(max, `longer than ${max} characters`).regex(new RegExp(PLAIN_PATTERN), "not one line of plain text").refine((value) => !URL_LIKE.test(value), "has a web address");
+    plain = (limits) => line(limits).refine((value) => !addressesAgent(value), "addresses an agent");
     whole = external_exports2.number().int().min(0);
     MeetingSchema = external_exports2.object({
       type: external_exports2.string(),
@@ -48664,7 +48703,7 @@ var init_src = __esm({
     BlindSpotDraft = external_exports2.object({ ...common, kind: external_exports2.literal("blind_spot"), dimension: external_exports2.enum(ITEM_DIMENSIONS), fields: BlindSpotFieldsSchema }).strict();
     FrameworkDraft = external_exports2.object({ ...common, kind: external_exports2.literal("framework"), dimension: external_exports2.enum(ITEM_DIMENSIONS), fields: FrameworkFieldsSchema }).strict();
     ProposalSchema = external_exports2.discriminatedUnion("kind", [RootDraft, PatternDraft, BlindSpotDraft, FrameworkDraft]).superRefine(checkLayers);
-    OpportunitySchema = external_exports2.object({ meeting_id: text, turn: whole, quote: external_exports2.string(), state: external_exports2.enum(STATES), why: line(PLAIN.why), steps: external_exports2.array(external_exports2.string().regex(/^S[1-7]$/)).max(7).optional() }).strict();
+    OpportunitySchema = external_exports2.object({ meeting_id: text, turn: whole, quote: external_exports2.string(), state: external_exports2.enum(STATES), why: plain(PLAIN.why), steps: external_exports2.array(external_exports2.string().regex(/^S[1-7]$/)).max(7).optional() }).strict();
     RefSchema = external_exports2.object({ meeting_id: text, turn: whole }).strict();
     ControlSchema = external_exports2.object({ eligible: whole, shown: whole, fired: whole, refs: external_exports2.array(RefSchema) }).strict();
     MeasureSchema = external_exports2.object({ fired: whole, absent: whole, contradicted: whole, meetings_fired: whole, control: ControlSchema.nullable(), too_broad: external_exports2.boolean() }).strict();
@@ -48690,8 +48729,13 @@ var init_src = __esm({
       if (m.fired !== count("fired") || m.absent !== count("absent") || m.contradicted !== count("contradicted") || m.meetings_fired !== meetings) ctx.addIssue({ code: "custom", path: ["measure"], message: "measure does not match the opportunities" });
       if (m.control && (m.control.shown !== m.control.refs.length || m.control.fired > m.control.shown || m.control.shown > m.control.eligible)) ctx.addIssue({ code: "custom", path: ["measure", "control"], message: "control counts do not add up" });
     });
-    ProposalsSchema = external_exports2.array(ProposalSchema, { error: "no items list" }).superRefine((items, ctx) => checkSet(items, ctx, true));
-    ItemsSchema = external_exports2.array(ItemSchema, { error: "no items list" }).superRefine((items, ctx) => checkSet(items, ctx, false));
+    mostlyOpposite = (m) => m.contradicted >= 2 && m.contradicted > m.fired;
+    MEETINGS_PER_ROOT = 20;
+    rootRange = (meetings) => ({
+      min: Math.max(1, Math.min(KIND_COUNT.root.min, Math.floor(meetings / MEETINGS_PER_ROOT))),
+      max: KIND_COUNT.root.max
+    });
+    ItemsSchema = external_exports2.array(ItemSchema, { error: "no items list" }).superRefine((items, ctx) => checkSet(items, ctx, null));
     reason = plain(PLAIN.why);
     OpSchema = external_exports2.discriminatedUnion("op", [
       external_exports2.object({ op: external_exports2.literal("revise"), id: itemId, item: ItemSchema, reason }).strict(),
@@ -48705,7 +48749,7 @@ var init_src = __esm({
     held = { protected: external_exports2.boolean(), evidence_calls: external_exports2.array(text).max(500) };
     ExistingSchema = external_exports2.discriminatedUnion("kind", [RootDraft.extend(held), PatternDraft.extend(held), BlindSpotDraft.extend(held), FrameworkDraft.extend(held)]).superRefine(checkLayers);
     ExistingListSchema = external_exports2.array(ExistingSchema).min(1, "no existing items sent").max(UPDATE.existing, `more than ${UPDATE.existing} existing items`).superRefine((items, ctx) => {
-      checkSet(items, ctx, false, UPDATE.existing);
+      checkSet(items, ctx, null, UPDATE.existing);
       if (utf8Bytes(JSON.stringify(items)) > UPDATE.existingBytes) ctx.addIssue({ code: "custom", message: `existing items are larger than ${UPDATE.existingBytes} bytes` });
     });
     start = { type: external_exports2.literal("start"), protocol: external_exports2.literal(PROTOCOL, { error: OUT_OF_DATE }), meetings: external_exports2.array(MeetingEntrySchema).min(1, "no meetings sent"), moments: external_exports2.array(MomentSchema) };
@@ -48731,7 +48775,7 @@ var init_src = __esm({
     ServerMessageSchema = external_exports2.union([...Object.values(CallSchemas), ...Object.values(ServerSchemas)]);
     SampleSchema = external_exports2.object({ eligible: whole, turns: external_exports2.array(TurnHitSchema) });
     ToolResultSchemas = { search_moments: external_exports2.array(MomentHitSchema), search_turns: external_exports2.array(TurnHitSchema), read_context: ContextSchema, sample_turns: SampleSchema };
-    WhySchema = line(PLAIN.why);
+    WhySchema = plain(PLAIN.why);
     checkItem = (value) => parse6(ItemSchema, value, "item refused");
     checkItems = (value) => parse6(ItemsSchema, value, "items refused");
     checkUpdateResult = (value) => parse6(UpdateResultSchema, value, "update refused");
@@ -48799,7 +48843,7 @@ function describeZodError(err) {
   const where = issue3.path.length ? `"${issue3.path.join(".")}"` : "the file";
   return `${where}: ${issue3.message}`;
 }
-var SCHEMA_VERSION, ID_ALPHABET, ID_BODY, ITEM_TYPES, TYPE_PREFIX, ITEM_PREFIXES, ID_PREFIXES, ITEM_ID_PATTERN, CONTROL_CHARS, FORBIDDEN_CHARS, URL_LIKE, AGENT_PHRASES, AGENT_PATTERNS, idOf, itemId2, DATE_RE, INSTANT_RE, dateStr, instant, sha256Hex, schemaVersion, clockText, itemTypeSchema, itemStatusSchema, makeIdeaSchema, nameSchema, aliasesSchema, mechanismSchema, dimensionSchema, layerTextSchema, toPersonSchema, itemDefinitionBase, itemDefinitionSchema, callEvidenceSchema, manualEvidenceSchema, evidenceSchema, DISCARD_REASONS, discardReasonSchema, FIELDS_BY_TYPE, itemSchema, ITEM_KEY_ORDER, EVIDENCE_KEY_ORDER, MANUAL_EVIDENCE_KEY_ORDER, CALL_KEY_ORDER, callFileSchema, redirectStubSchema, looseText, oneLine, MAX_WORKING_ON, MAX_STARTING_CALLS, workingOnSchema, measureSchema, profileFileSchema, actorSchema, pendingActionSchema, JOB_KINDS, jobSchema, attemptSchema, EVENT_KINDS, eventSchema, TXN_STEPS, stepSchema, relPath, txnOpSchema, txnManifestSchema, settingsSchema, writerLockSchema, momentsFileSchema, THRESHOLD_KEYS, assetSchema, CALL_RESULTS, OP_RESULTS, SUGGESTION_STATES, rootsRunSchema, nodeCallSchema, nodeSelectionSchema;
+var SCHEMA_VERSION, ID_ALPHABET, ID_BODY, ITEM_TYPES, TYPE_PREFIX, ITEM_PREFIXES, ID_PREFIXES, ITEM_ID_PATTERN, idOf, itemId2, DATE_RE, INSTANT_RE, dateStr, instant, sha256Hex, schemaVersion, clockText, itemTypeSchema, itemStatusSchema, makeIdeaSchema, nameSchema, aliasesSchema, mechanismSchema, dimensionSchema, layerTextSchema, toPersonSchema, itemDefinitionBase, itemDefinitionSchema, callEvidenceSchema, manualEvidenceSchema, evidenceSchema, DISCARD_REASONS, discardReasonSchema, FIELDS_BY_TYPE, itemSchema, ITEM_KEY_ORDER, EVIDENCE_KEY_ORDER, MANUAL_EVIDENCE_KEY_ORDER, CALL_KEY_ORDER, callFileSchema, redirectStubSchema, looseText, oneLine, MAX_WORKING_ON, MAX_STARTING_CALLS, workingOnSchema, measureSchema, profileFileSchema, actorSchema, pendingActionSchema, JOB_KINDS, jobSchema, attemptSchema, EVENT_KINDS, eventSchema, TXN_STEPS, stepSchema, relPath, txnOpSchema, txnManifestSchema, settingsSchema, writerLockSchema, momentsFileSchema, THRESHOLD_KEYS, assetSchema, CALL_RESULTS, OP_RESULTS, SUGGESTION_STATES, rootsRunSchema, nodeCallSchema, nodeSelectionSchema;
 var init_schema = __esm({
   "src/core/schema.ts"() {
     "use strict";
@@ -48850,44 +48894,6 @@ var init_schema = __esm({
       "rr"
     ];
     ITEM_ID_PATTERN = new RegExp(`^[pbmf]-${ID_BODY}$`);
-    CONTROL_CHARS = /[\u0000-\u001f\u007f-\u009f\u2028\u2029]/;
-    FORBIDDEN_CHARS = /[|`<>[\]{}]/;
-    URL_LIKE = /(https?:\/\/|www\.)/i;
-    AGENT_PHRASES = [
-      "ignore previous",
-      "ignore all",
-      "ignore the above",
-      "disregard",
-      "system prompt",
-      "you must",
-      "you should",
-      "you need to",
-      "you have to",
-      "as an ai",
-      "assistant:",
-      "<|"
-    ];
-    AGENT_PATTERNS = [
-      // ignore / disregard / override ... the instructions, rules, or sources
-      /\b(ignore|disregard|override|bypass)\b[^.\n]{0,40}\b(instructions?|rules|guidelines?|prompts?|previous|prior|earlier|above|system|sources?|source items|safeguards?|restrictions?)\b/i,
-      /\bforget (everything|all)\b[^.\n]{0,25}\b(you|told|said|above|earlier|before)\b/i,
-      // a role or system marker at the start of a line
-      /(^|\n)\s*(system|assistant|developer)\s*:/i,
-      /(^|\s)(<\||\[inst\]|###\s*(system|instruction))/i,
-      // talking to the AI
-      /\b(you are (now|no longer)|you are an? (ai|assistant|agent|model|language model|chatbot|unrestricted|unfiltered)|act as an? (unrestricted|unfiltered|ai assistant|ai model|chatbot|language model)|pretend (to be|you)|new instructions?|jailbreak)\b/i,
-      /\bfrom now on,?\s+(always\s+|only\s+)?(answer|respond|reply|write|speak|say)\b/i,
-      /^\s*(hey |hi |dear )?(assistant|chatgpt|claude|llm|ai)\s*[,:]/i,
-      // a standing rule for whoever is drafting
-      /\bwhen (you )?(drafting|writing|generating|replying|responding|making|creating|summari[sz]ing|answering)\b[^.\n]{0,30},?\s*(always|never|do not|don't|ignore|only|use|include|add|skip|mention|say)\b/i,
-      // hiding things from the person, or printing secrets
-      /\b(do not|don't|never)\s+(tell|mention|reveal|show|inform)\s+(the\s+)?(person|user|owner|reader)\b/i,
-      /\b(print|reveal|output|repeat|show|leak)\b[^.\n]{0,30}\b(system prompt|your instructions|the token|api key|secret|password)\b/i,
-      // the app's own tool names, and paths inside the CF folder
-      /\bcf_[a-z_]{4,}\b/i,
-      /\b(fingerprint|workshop)\/[\w.-]/i,
-      /\.\.\//
-    ];
     idOf = (...prefixes) => external_exports.string().regex(
       new RegExp(`^(${prefixes.join("|")})-${ID_BODY}$`),
       `must be an id like ${prefixes[0]}-abc234 (prefix ${prefixes.join(" or ")}, then 6 base32 characters)`
@@ -74801,6 +74807,7 @@ function placeItem(run, item, pool, result) {
   let setAside2 = null;
   const discarded = pool.tombstones.find((t) => t.item.type === type && [t.item.name, ...t.item.aliases].some((name) => sameName2(name, item.name)));
   if (item.measure.too_broad) setAside2 = "it fit too many unrelated moments";
+  else if (mostlyOpposite(item.measure)) setAside2 = "your calls showed the opposite more often than they showed it";
   else if (discarded) setAside2 = `you discarded ${discarded.id} with this name before`;
   else if (!evidence.length) setAside2 = "none of its quotes held up";
   else {

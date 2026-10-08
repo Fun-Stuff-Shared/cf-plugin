@@ -61047,12 +61047,51 @@ var OUT_OF_DATE = "This CF app is out of date. Update it, then run again. Nothin
 var utf8Bytes = (text2) => new TextEncoder().encode(text2).length;
 var UPDATE = { existing: 30, existingBytes: 6e4, results: 12, new: 6, splitParts: 3 };
 var text = external_exports2.string().trim().min(1);
-var PLAIN_PATTERN = "^[^|`<>\\[\\]{}\\n\\r]*$";
-var TO_PERSON_PATTERN = "^You\\b[^|`<>\\[\\]{}\\n\\r]*$";
-var AGENT_WORDS = ["ignore previous", "ignore all", "ignore the above", "disregard", "system prompt", "you must", "you should", "as an ai", "assistant:", "<|"];
+var CONTROL_CHARS = /[\u0000-\u001f\u007f-\u009f\u2028\u2029]/;
+var FORBIDDEN_CHARS = /[|`<>[\]{}]/;
+var URL_LIKE = /(https?:\/\/|www\.)/i;
+var PLAIN_CHARS = "[^|`<>\\[\\]{}\\u0000-\\u001f\\u007f-\\u009f\\u2028\\u2029]";
+var PLAIN_PATTERN = `^${PLAIN_CHARS}*$`;
+var TO_PERSON_PATTERN = `^You\\b${PLAIN_CHARS}*$`;
+var AGENT_PHRASES = [
+  "ignore previous",
+  "ignore all",
+  "ignore the above",
+  "disregard",
+  "system prompt",
+  "you must",
+  "you should",
+  "you need to",
+  "you have to",
+  "as an ai",
+  "assistant:",
+  "<|"
+];
+var AGENT_PATTERNS = [
+  // ignore / disregard / override ... the instructions, rules, or sources
+  /\b(ignore|disregard|override|bypass)\b[^.\n]{0,40}\b(instructions?|rules|guidelines?|prompts?|previous|prior|earlier|above|system|sources?|source items|safeguards?|restrictions?)\b/i,
+  /\bforget (everything|all)\b[^.\n]{0,25}\b(you|told|said|above|earlier|before)\b/i,
+  // a role or system marker at the start of a line
+  /(^|\n)\s*(system|assistant|developer)\s*:/i,
+  /(^|\s)(<\||\[inst\]|###\s*(system|instruction))/i,
+  // talking to the AI
+  /\b(you are (now|no longer)|you are an? (ai|assistant|agent|model|language model|chatbot|unrestricted|unfiltered)|act as an? (unrestricted|unfiltered|ai assistant|ai model|chatbot|language model)|pretend (to be|you)|new instructions?|jailbreak)\b/i,
+  /\bfrom now on,?\s+(always\s+|only\s+)?(answer|respond|reply|write|speak|say)\b/i,
+  /^\s*(hey |hi |dear )?(assistant|chatgpt|claude|llm|ai)\s*[,:]/i,
+  // a standing rule for whoever is drafting
+  /\bwhen (you )?(drafting|writing|generating|replying|responding|making|creating|summari[sz]ing|answering)\b[^.\n]{0,30},?\s*(always|never|do not|don't|ignore|only|use|include|add|skip|mention|say)\b/i,
+  // hiding things from the person, or printing secrets
+  /\b(do not|don't|never)\s+(tell|mention|reveal|show|inform)\s+(the\s+)?(person|user|owner|reader)\b/i,
+  /\b(print|reveal|output|repeat|show|leak)\b[^.\n]{0,30}\b(system prompt|your instructions|the token|api key|secret|password)\b/i,
+  // the app's own tool names, and paths inside the CF folder
+  /\bcf_[a-z_]{4,}\b/i,
+  /\b(fingerprint|workshop)\/[\w.-]/i,
+  /\.\.\//
+];
+var addressesAgent = (value) => AGENT_PHRASES.some((phrase) => value.toLowerCase().includes(phrase)) || AGENT_PATTERNS.some((re) => re.test(value));
 var PLAIN = { name: { min: 3, max: 80 }, alias: { min: 2, max: 60 }, summary: { min: 10, max: 240 }, why: { min: 5, max: 240 }, layer: { min: 5, max: 240 }, idea: { min: 10, max: 140 }, step: { min: 5, max: 120 }, root: { min: 10, max: 1200 }, situation: { min: 3, max: 300 }, condition: { min: 3, max: 400 } };
-var line = ({ min, max }) => external_exports2.string().trim().min(min, `shorter than ${min} characters`).max(max, `longer than ${max} characters`).regex(new RegExp(PLAIN_PATTERN), "not one line of plain text").refine((value) => !/https?:\/\/|www\./i.test(value), "has a web address");
-var plain = (limits) => line(limits).refine((value) => !AGENT_WORDS.some((words) => value.toLowerCase().includes(words)), "addresses an agent");
+var line = ({ min, max }) => external_exports2.string().trim().min(min, `shorter than ${min} characters`).max(max, `longer than ${max} characters`).regex(new RegExp(PLAIN_PATTERN), "not one line of plain text").refine((value) => !URL_LIKE.test(value), "has a web address");
+var plain = (limits) => line(limits).refine((value) => !addressesAgent(value), "addresses an agent");
 var whole = external_exports2.number().int().min(0);
 var MeetingSchema = external_exports2.object({
   type: external_exports2.string(),
@@ -61113,7 +61152,7 @@ function checkLayers(item, ctx) {
   }
 }
 var ProposalSchema = external_exports2.discriminatedUnion("kind", [RootDraft, PatternDraft, BlindSpotDraft, FrameworkDraft]).superRefine(checkLayers);
-var OpportunitySchema = external_exports2.object({ meeting_id: text, turn: whole, quote: external_exports2.string(), state: external_exports2.enum(STATES), why: line(PLAIN.why), steps: external_exports2.array(external_exports2.string().regex(/^S[1-7]$/)).max(7).optional() }).strict();
+var OpportunitySchema = external_exports2.object({ meeting_id: text, turn: whole, quote: external_exports2.string(), state: external_exports2.enum(STATES), why: plain(PLAIN.why), steps: external_exports2.array(external_exports2.string().regex(/^S[1-7]$/)).max(7).optional() }).strict();
 var RefSchema = external_exports2.object({ meeting_id: text, turn: whole }).strict();
 var ControlSchema = external_exports2.object({ eligible: whole, shown: whole, fired: whole, refs: external_exports2.array(RefSchema) }).strict();
 var MeasureSchema = external_exports2.object({ fired: whole, absent: whole, contradicted: whole, meetings_fired: whole, control: ControlSchema.nullable(), too_broad: external_exports2.boolean() }).strict();
@@ -61139,21 +61178,25 @@ var ItemSchema = external_exports2.discriminatedUnion("kind", [RootDraft.extend(
   if (m.fired !== count("fired") || m.absent !== count("absent") || m.contradicted !== count("contradicted") || m.meetings_fired !== meetings) ctx.addIssue({ code: "custom", path: ["measure"], message: "measure does not match the opportunities" });
   if (m.control && (m.control.shown !== m.control.refs.length || m.control.fired > m.control.shown || m.control.shown > m.control.eligible)) ctx.addIssue({ code: "custom", path: ["measure", "control"], message: "control counts do not add up" });
 });
-function checkSet(items, ctx, counted, max = ITEM_MAX) {
+var MEETINGS_PER_ROOT = 20;
+var rootRange = (meetings) => ({
+  min: Math.max(1, Math.min(KIND_COUNT.root.min, Math.floor(meetings / MEETINGS_PER_ROOT))),
+  max: KIND_COUNT.root.max
+});
+function checkSet(items, ctx, meetings, max = ITEM_MAX) {
   if (new Set(items.map((item) => item.id)).size !== items.length) ctx.addIssue({ code: "custom", message: "an item id appears twice" });
   if (items.length > max) ctx.addIssue({ code: "custom", message: `more than ${max} items` });
-  if (counted) {
+  if (meetings !== null) {
     for (const kind of KINDS) {
       const n = items.filter((item) => item.kind === kind).length;
-      const { min, max: max2 } = KIND_COUNT[kind];
+      const { min, max: max2 } = kind === "root" ? rootRange(meetings) : KIND_COUNT[kind];
       if (n < min || n > max2) ctx.addIssue({ code: "custom", message: `expected ${min} to ${max2} items of kind ${kind}, got ${n}` });
     }
   }
   const roots = new Set(items.filter((item) => item.kind === "root").map((item) => item.id));
   for (const item of items) for (const id of "expresses" in item.fields ? item.fields.expresses : []) if (!roots.has(id)) ctx.addIssue({ code: "custom", message: `${item.id} expresses ${id}, which is not a root in this set` });
 }
-var ProposalsSchema = external_exports2.array(ProposalSchema, { error: "no items list" }).superRefine((items, ctx) => checkSet(items, ctx, true));
-var ItemsSchema = external_exports2.array(ItemSchema, { error: "no items list" }).superRefine((items, ctx) => checkSet(items, ctx, false));
+var ItemsSchema = external_exports2.array(ItemSchema, { error: "no items list" }).superRefine((items, ctx) => checkSet(items, ctx, null));
 var reason = plain(PLAIN.why);
 var OpSchema = external_exports2.discriminatedUnion("op", [
   external_exports2.object({ op: external_exports2.literal("revise"), id: itemId, item: ItemSchema, reason }).strict(),
@@ -61167,7 +61210,7 @@ var RunReportSchema = external_exports2.object({ proposer: external_exports2.obj
 var held = { protected: external_exports2.boolean(), evidence_calls: external_exports2.array(text).max(500) };
 var ExistingSchema = external_exports2.discriminatedUnion("kind", [RootDraft.extend(held), PatternDraft.extend(held), BlindSpotDraft.extend(held), FrameworkDraft.extend(held)]).superRefine(checkLayers);
 var ExistingListSchema = external_exports2.array(ExistingSchema).min(1, "no existing items sent").max(UPDATE.existing, `more than ${UPDATE.existing} existing items`).superRefine((items, ctx) => {
-  checkSet(items, ctx, false, UPDATE.existing);
+  checkSet(items, ctx, null, UPDATE.existing);
   if (utf8Bytes(JSON.stringify(items)) > UPDATE.existingBytes) ctx.addIssue({ code: "custom", message: `existing items are larger than ${UPDATE.existingBytes} bytes` });
 });
 var start = { type: external_exports2.literal("start"), protocol: external_exports2.literal(PROTOCOL, { error: OUT_OF_DATE }), meetings: external_exports2.array(MeetingEntrySchema).min(1, "no meetings sent"), moments: external_exports2.array(MomentSchema) };
@@ -61193,7 +61236,7 @@ var DeviceMessageSchema = external_exports2.union([StartSchema, ReplySchema]);
 var ServerMessageSchema = external_exports2.union([...Object.values(CallSchemas), ...Object.values(ServerSchemas)]);
 var SampleSchema = external_exports2.object({ eligible: whole, turns: external_exports2.array(TurnHitSchema) });
 var ToolResultSchemas = { search_moments: external_exports2.array(MomentHitSchema), search_turns: external_exports2.array(TurnHitSchema), read_context: ContextSchema, sample_turns: SampleSchema };
-var WhySchema = line(PLAIN.why);
+var WhySchema = plain(PLAIN.why);
 
 // src/core/transcript-layouts.ts
 var SOURCE_APPS = ["zoom", "teams", "meet", "otter", "fireflies", "fathom", "granola", "tldv", "read", "plaud", "local"];
@@ -61250,44 +61293,6 @@ function idPattern(prefix) {
   return new RegExp(`^${prefix}-${ID_BODY}$`);
 }
 var ITEM_ID_PATTERN = new RegExp(`^[pbmf]-${ID_BODY}$`);
-var CONTROL_CHARS = /[\u0000-\u001f\u007f-\u009f\u2028\u2029]/;
-var FORBIDDEN_CHARS = /[|`<>[\]{}]/;
-var URL_LIKE = /(https?:\/\/|www\.)/i;
-var AGENT_PHRASES = [
-  "ignore previous",
-  "ignore all",
-  "ignore the above",
-  "disregard",
-  "system prompt",
-  "you must",
-  "you should",
-  "you need to",
-  "you have to",
-  "as an ai",
-  "assistant:",
-  "<|"
-];
-var AGENT_PATTERNS = [
-  // ignore / disregard / override ... the instructions, rules, or sources
-  /\b(ignore|disregard|override|bypass)\b[^.\n]{0,40}\b(instructions?|rules|guidelines?|prompts?|previous|prior|earlier|above|system|sources?|source items|safeguards?|restrictions?)\b/i,
-  /\bforget (everything|all)\b[^.\n]{0,25}\b(you|told|said|above|earlier|before)\b/i,
-  // a role or system marker at the start of a line
-  /(^|\n)\s*(system|assistant|developer)\s*:/i,
-  /(^|\s)(<\||\[inst\]|###\s*(system|instruction))/i,
-  // talking to the AI
-  /\b(you are (now|no longer)|you are an? (ai|assistant|agent|model|language model|chatbot|unrestricted|unfiltered)|act as an? (unrestricted|unfiltered|ai assistant|ai model|chatbot|language model)|pretend (to be|you)|new instructions?|jailbreak)\b/i,
-  /\bfrom now on,?\s+(always\s+|only\s+)?(answer|respond|reply|write|speak|say)\b/i,
-  /^\s*(hey |hi |dear )?(assistant|chatgpt|claude|llm|ai)\s*[,:]/i,
-  // a standing rule for whoever is drafting
-  /\bwhen (you )?(drafting|writing|generating|replying|responding|making|creating|summari[sz]ing|answering)\b[^.\n]{0,30},?\s*(always|never|do not|don't|ignore|only|use|include|add|skip|mention|say)\b/i,
-  // hiding things from the person, or printing secrets
-  /\b(do not|don't|never)\s+(tell|mention|reveal|show|inform)\s+(the\s+)?(person|user|owner|reader)\b/i,
-  /\b(print|reveal|output|repeat|show|leak)\b[^.\n]{0,30}\b(system prompt|your instructions|the token|api key|secret|password)\b/i,
-  // the app's own tool names, and paths inside the CF folder
-  /\bcf_[a-z_]{4,}\b/i,
-  /\b(fingerprint|workshop)\/[\w.-]/i,
-  /\.\.\//
-];
 function plainTextProblem(value, label, min, max) {
   if (CONTROL_CHARS.test(value)) return `${label} must be one line with no control characters.`;
   if (FORBIDDEN_CHARS.test(value)) {

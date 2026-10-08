@@ -2,6 +2,12 @@
 
 Every release has a new version in `plugin/.claude-plugin/plugin.json`. Claude Code ignores new commits under an unchanged version, so a change with no bump never reaches anyone. The Build line under each heading is written by `npm run build:plugin`.
 
+## 0.10.2 - 2026-10-08
+
+Build: dist sha256 9d26c9081f79f8ed1f719d1ef2b0f08f0ecbe6576668e5bfd065500f5cc054b5; skills sha256 206d0c6c0519aea2758ca56f3d69836b66eeec74eac555f4eeb23f6d936cfd94
+
+Find Your Roots asks for fewer roots when you have fewer calls, so your roots say different things instead of overlapping. A finding your calls showed the opposite of more often than they showed it is set aside instead of offered to you. A single badly worded note can no longer stop a run from saving, and frameworks are tested more reliably.
+
 ## 0.10.1 - 2026-10-08
 
 Build: dist sha256 97d4d8b793ddf649502b5877f3c52a05f9ce02158f4e1ee28e1662412c0ffc01; skills sha256 206d0c6c0519aea2758ca56f3d69836b66eeec74eac555f4eeb23f6d936cfd94
