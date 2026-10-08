@@ -2,6 +2,20 @@
 
 Every release has a new version in `plugin/.claude-plugin/plugin.json`. Claude Code ignores new commits under an unchanged version, so a change with no bump never reaches anyone. The Build line under each heading is written by `npm run build:plugin`.
 
+## 0.10.0 - 2026-10-08
+
+Build: dist sha256 65e02250a7dc98c39001df8e12da11c86b468e8946e8bb20efc8df9957bcd396; skills sha256 206d0c6c0519aea2758ca56f3d69836b66eeec74eac555f4eeb23f6d936cfd94
+
+Find Your Roots now keeps your findings up to date. Once you have findings, it sends only the calls no earlier run used, tests your findings on them, and may reword a finding, fold two that say the same thing into one, split one that covers two things, or add a new one. Every change is tested across all your calls before it is kept, and a finding keeps its id and its earlier version. A change to a finding you kept waits for you under Suggested Changes in the Extraction Room. A finding the new calls mostly contradict is listed under Weakening.
+
+Nothing from Find Your Roots reaches your AI tools until you press Confirm. A finding shows how many calls showed it, and you decide.
+
+If Claude Code is not signed in on this computer, Find Your Roots says so before it starts and tells you to run claude auth login in Terminal.
+
+The privacy page now says exactly what Find Your Roots sends: parts of the calls you chose, including what others said around your moments, during the run only. The CF service stores none of it.
+
+Opening a finding shows the roots it comes from.
+
 ## 0.9.1 - 2026-10-08
 
 Build: dist sha256 6bc2b1007c3de437057c9e8aa4deba8037dbfa73e8cda5f548097f6ffb2709d4; skills sha256 206d0c6c0519aea2758ca56f3d69836b66eeec74eac555f4eeb23f6d936cfd94

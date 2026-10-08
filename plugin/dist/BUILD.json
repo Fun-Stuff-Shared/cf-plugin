@@ -1,8 +1,8 @@
 {
   "name": "cflab",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "date": "2026-10-08",
-  "sha256": "6bc2b1007c3de437057c9e8aa4deba8037dbfa73e8cda5f548097f6ffb2709d4",
+  "sha256": "65e02250a7dc98c39001df8e12da11c86b468e8946e8bb20efc8df9957bcd396",
   "skills_sha256": "206d0c6c0519aea2758ca56f3d69836b66eeec74eac555f4eeb23f6d936cfd94",
   "skills": [
     "cf-expertise",

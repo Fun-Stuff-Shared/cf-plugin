@@ -1120,18 +1120,18 @@ ${indent}${text3.slice(fold + 1, end2)}`;
     }
     function consumeMoreIndentedLines(text3, i, indent) {
       let end = i;
-      let start = i + 1;
-      let ch = text3[start];
+      let start2 = i + 1;
+      let ch = text3[start2];
       while (ch === " " || ch === "	") {
-        if (i < start + indent) {
+        if (i < start2 + indent) {
           ch = text3[++i];
         } else {
           do {
             ch = text3[++i];
           } while (ch && ch !== "\n");
           end = i;
-          start = i + 1;
-          ch = text3[start];
+          start2 = i + 1;
+          ch = text3[start2];
         }
       }
       return end;
@@ -1162,12 +1162,12 @@ var require_stringifyString = __commonJS({
       const strLen = str2.length;
       if (strLen <= limit)
         return false;
-      for (let i = 0, start = 0; i < strLen; ++i) {
+      for (let i = 0, start2 = 0; i < strLen; ++i) {
         if (str2[i] === "\n") {
-          if (i - start > limit)
+          if (i - start2 > limit)
             return true;
-          start = i + 1;
-          if (strLen - start <= limit)
+          start2 = i + 1;
+          if (strLen - start2 <= limit)
             return false;
         }
       }
@@ -1181,19 +1181,19 @@ var require_stringifyString = __commonJS({
       const minMultiLineLength = ctx.options.doubleQuotedMinMultiLineLength;
       const indent = ctx.indent || (containsDocumentMarker(value) ? "  " : "");
       let str2 = "";
-      let start = 0;
+      let start2 = 0;
       for (let i = 0, ch = json4[i]; ch; ch = json4[++i]) {
         if (ch === " " && json4[i + 1] === "\\" && json4[i + 2] === "n") {
-          str2 += json4.slice(start, i) + "\\ ";
+          str2 += json4.slice(start2, i) + "\\ ";
           i += 1;
-          start = i;
+          start2 = i;
           ch = "\\";
         }
         if (ch === "\\")
           switch (json4[i + 1]) {
             case "u":
               {
-                str2 += json4.slice(start, i);
+                str2 += json4.slice(start2, i);
                 const code = json4.substr(i + 2, 4);
                 switch (code) {
                   case "0000":
@@ -1227,14 +1227,14 @@ var require_stringifyString = __commonJS({
                       str2 += json4.substr(i, 6);
                 }
                 i += 5;
-                start = i + 1;
+                start2 = i + 1;
               }
               break;
             case "n":
               if (implicitKey || json4[i + 2] === '"' || json4.length < minMultiLineLength) {
                 i += 1;
               } else {
-                str2 += json4.slice(start, i) + "\n\n";
+                str2 += json4.slice(start2, i) + "\n\n";
                 while (json4[i + 2] === "\\" && json4[i + 3] === "n" && json4[i + 4] !== '"') {
                   str2 += "\n";
                   i += 2;
@@ -1243,14 +1243,14 @@ var require_stringifyString = __commonJS({
                 if (json4[i + 2] === " ")
                   str2 += "\\";
                 i += 1;
-                start = i + 1;
+                start2 = i + 1;
               }
               break;
             default:
               i += 1;
           }
       }
-      str2 = start ? str2 + json4.slice(start) : json4;
+      str2 = start2 ? str2 + json4.slice(start2) : json4;
       return implicitKey ? str2 : foldFlowLines.foldFlowLines(str2, indent, foldFlowLines.FOLD_QUOTED, getFoldOptions(ctx, false));
     }
     function singleQuotedString(value, ctx) {
@@ -1329,10 +1329,10 @@ ${indent}`) + "'";
         else
           break;
       }
-      let start = value.substring(0, startNlPos < startEnd ? startNlPos + 1 : startEnd);
-      if (start) {
-        value = value.substring(start.length);
-        start = start.replace(/\n+/g, `$&${indent}`);
+      let start2 = value.substring(0, startNlPos < startEnd ? startNlPos + 1 : startEnd);
+      if (start2) {
+        value = value.substring(start2.length);
+        start2 = start2.replace(/\n+/g, `$&${indent}`);
       }
       const indentSize = indent ? "2" : "1";
       let header = (startWithSpace ? indentSize : "") + chomp;
@@ -1350,14 +1350,14 @@ ${indent}`) + "'";
             literalFallback = true;
           };
         }
-        const body = foldFlowLines.foldFlowLines(`${start}${foldedValue}${end}`, indent, foldFlowLines.FOLD_BLOCK, foldOptions);
+        const body = foldFlowLines.foldFlowLines(`${start2}${foldedValue}${end}`, indent, foldFlowLines.FOLD_BLOCK, foldOptions);
         if (!literalFallback)
           return `>${header}
 ${indent}${body}`;
       }
       value = value.replace(/\n+/g, `$&${indent}`);
       return `|${header}
-${indent}${start}${value}${end}`;
+${indent}${start2}${value}${end}`;
     }
     function plainString(item, ctx, onComment, onChompKeep) {
       const { type, value } = item;
@@ -1988,23 +1988,23 @@ ${indent}${line2}` : "\n";
         lines.push(str2);
         linesAtValue = lines.length;
       }
-      const { start, end } = flowChars;
+      const { start: start2, end } = flowChars;
       if (lines.length === 0) {
-        return start + end;
+        return start2 + end;
       } else {
         if (!reqNewline) {
           const len = lines.reduce((sum, line2) => sum + line2.length + 2, 2);
           reqNewline = ctx.options.lineWidth > 0 && len > ctx.options.lineWidth;
         }
         if (reqNewline) {
-          let str2 = start;
+          let str2 = start2;
           for (const line2 of lines)
             str2 += line2 ? `
 ${indentStep}${indent}${line2}` : "\n";
           return `${str2}
 ${indent}${end}`;
         } else {
-          return `${start}${fcPadding}${lines.join(" ")}${fcPadding}${end}`;
+          return `${start2}${fcPadding}${lines.join(" ")}${fcPadding}${end}`;
         }
       }
     }
@@ -3799,7 +3799,7 @@ var require_resolve_props = __commonJS({
       let newlineAfterProp = null;
       let comma = null;
       let found = null;
-      let start = null;
+      let start2 = null;
       for (const token of tokens) {
         if (reqSpace) {
           if (token.type !== "space" && token.type !== "newline" && token.type !== "comma")
@@ -3851,7 +3851,7 @@ var require_resolve_props = __commonJS({
             if (token.source.endsWith(":"))
               onError(token.offset + token.source.length - 1, "BAD_ALIAS", "Anchor ending in : is ambiguous", true);
             anchor3 = token;
-            start ?? (start = token.offset);
+            start2 ?? (start2 = token.offset);
             atNewline = false;
             hasSpace = false;
             reqSpace = true;
@@ -3860,7 +3860,7 @@ var require_resolve_props = __commonJS({
             if (tag)
               onError(token, "MULTIPLE_TAGS", "A node can have at most one tag");
             tag = token;
-            start ?? (start = token.offset);
+            start2 ?? (start2 = token.offset);
             atNewline = false;
             hasSpace = false;
             reqSpace = true;
@@ -3908,7 +3908,7 @@ var require_resolve_props = __commonJS({
         tag,
         newlineAfterProp,
         end,
-        start: start ?? end
+        start: start2 ?? end
       };
     }
     exports.resolveProps = resolveProps;
@@ -4010,8 +4010,8 @@ var require_resolve_block_map = __commonJS({
       let offset = bm.offset;
       let commentEnd = null;
       for (const collItem of bm.items) {
-        const { start, key, sep: sep8, value } = collItem;
-        const keyProps = resolveProps.resolveProps(start, {
+        const { start: start2, key, sep: sep8, value } = collItem;
+        const keyProps = resolveProps.resolveProps(start2, {
           indicator: "explicit-key-ind",
           next: key ?? sep8?.[0],
           offset,
@@ -4038,14 +4038,14 @@ var require_resolve_block_map = __commonJS({
             continue;
           }
           if (keyProps.newlineAfterProp || utilContainsNewline.containsNewline(key)) {
-            onError(key ?? start[start.length - 1], "MULTILINE_IMPLICIT_KEY", "Implicit keys need to be on a single line");
+            onError(key ?? start2[start2.length - 1], "MULTILINE_IMPLICIT_KEY", "Implicit keys need to be on a single line");
           }
         } else if (keyProps.found?.indent !== bm.indent) {
           onError(offset, "BAD_INDENT", startColMsg);
         }
         ctx.atKey = true;
         const keyStart = keyProps.end;
-        const keyNode = key ? composeNode(ctx, key, keyProps, onError) : composeEmptyNode(ctx, keyStart, start, null, keyProps, onError);
+        const keyNode = key ? composeNode(ctx, key, keyProps, onError) : composeEmptyNode(ctx, keyStart, start2, null, keyProps, onError);
         if (ctx.schema.compat)
           utilFlowIndentCheck.flowIndentCheck(bm.indent, key, onError);
         ctx.atKey = false;
@@ -4115,8 +4115,8 @@ var require_resolve_block_seq = __commonJS({
         ctx.atKey = false;
       let offset = bs.offset;
       let commentEnd = null;
-      for (const { start, value } of bs.items) {
-        const props = resolveProps.resolveProps(start, {
+      for (const { start: start2, value } of bs.items) {
+        const props = resolveProps.resolveProps(start2, {
           indicator: "seq-item-ind",
           next: value,
           offset,
@@ -4137,7 +4137,7 @@ var require_resolve_block_seq = __commonJS({
             continue;
           }
         }
-        const node3 = value ? composeNode(ctx, value, props, onError) : composeEmptyNode(ctx, props.end, start, null, props, onError);
+        const node3 = value ? composeNode(ctx, value, props, onError) : composeEmptyNode(ctx, props.end, start2, null, props, onError);
         if (ctx.schema.compat)
           utilFlowIndentCheck.flowIndentCheck(bs.indent, value, onError);
         offset = node3.range[2];
@@ -4221,8 +4221,8 @@ var require_resolve_flow_collection = __commonJS({
       let offset = fc.offset + fc.start.source.length;
       for (let i = 0; i < fc.items.length; ++i) {
         const collItem = fc.items[i];
-        const { start, key, sep: sep8, value } = collItem;
-        const props = resolveProps.resolveProps(start, {
+        const { start: start2, key, sep: sep8, value } = collItem;
+        const props = resolveProps.resolveProps(start2, {
           flow: fcName,
           indicator: "explicit-key-ind",
           next: key ?? sep8?.[0],
@@ -4262,7 +4262,7 @@ var require_resolve_flow_collection = __commonJS({
             onError(props.start, "MISSING_CHAR", `Missing , between ${fcName} items`);
           if (props.comment) {
             let prevItemComment = "";
-            loop: for (const st of start) {
+            loop: for (const st of start2) {
               switch (st.type) {
                 case "comma":
                 case "space":
@@ -4295,7 +4295,7 @@ var require_resolve_flow_collection = __commonJS({
         } else {
           ctx.atKey = true;
           const keyStart = props.end;
-          const keyNode = key ? composeNode(ctx, key, props, onError) : composeEmptyNode(ctx, keyStart, start, null, props, onError);
+          const keyNode = key ? composeNode(ctx, key, props, onError) : composeEmptyNode(ctx, keyStart, start2, null, props, onError);
           if (isBlock(key))
             onError(keyNode.range, "BLOCK_IN_FLOW", blockMsg);
           ctx.atKey = false;
@@ -4458,10 +4458,10 @@ var require_resolve_block_scalar = __commonJS({
     "use strict";
     var Scalar = require_Scalar();
     function resolveBlockScalar(ctx, scalar, onError) {
-      const start = scalar.offset;
+      const start2 = scalar.offset;
       const header = parseBlockScalarHeader(scalar, ctx.options.strict, onError);
       if (!header)
-        return { value: "", type: null, comment: "", range: [start, start, start] };
+        return { value: "", type: null, comment: "", range: [start2, start2, start2] };
       const type = header.mode === ">" ? Scalar.Scalar.BLOCK_FOLDED : Scalar.Scalar.BLOCK_LITERAL;
       const lines = scalar.source ? splitLines(scalar.source) : [];
       let chompStart = lines.length;
@@ -4474,10 +4474,10 @@ var require_resolve_block_scalar = __commonJS({
       }
       if (chompStart === 0) {
         const value2 = header.chomp === "+" && lines.length > 0 ? "\n".repeat(Math.max(1, lines.length - 1)) : "";
-        let end2 = start + header.length;
+        let end2 = start2 + header.length;
         if (scalar.source)
           end2 += scalar.source.length;
-        return { value: value2, type, comment: header.comment, range: [start, end2, end2] };
+        return { value: value2, type, comment: header.comment, range: [start2, end2, end2] };
       }
       let trimIndent = scalar.indent + header.indent;
       let offset = scalar.offset + header.length;
@@ -4558,8 +4558,8 @@ var require_resolve_block_scalar = __commonJS({
         default:
           value += "\n";
       }
-      const end = start + header.length + scalar.source.length;
-      return { value, type, comment: header.comment, range: [start, end, end] };
+      const end = start2 + header.length + scalar.source.length;
+      return { value, type, comment: header.comment, range: [start2, end, end] };
     }
     function parseBlockScalarHeader({ offset, props }, strict, onError) {
       if (props[0].type !== "block-scalar-header") {
@@ -5081,7 +5081,7 @@ var require_compose_doc = __commonJS({
     var composeNode = require_compose_node();
     var resolveEnd = require_resolve_end();
     var resolveProps = require_resolve_props();
-    function composeDoc(options, directives, { offset, start, value, end }, onError) {
+    function composeDoc(options, directives, { offset, start: start2, value, end }, onError) {
       const opts = Object.assign({ _directives: directives }, options);
       const doc = new Document.Document(void 0, opts);
       const ctx = {
@@ -5091,7 +5091,7 @@ var require_compose_doc = __commonJS({
         options: doc.options,
         schema: doc.schema
       };
-      const props = resolveProps.resolveProps(start, {
+      const props = resolveProps.resolveProps(start2, {
         indicator: "doc-start",
         next: value ?? end?.[0],
         offset,
@@ -5104,7 +5104,7 @@ var require_compose_doc = __commonJS({
         if (value && (value.type === "block-map" || value.type === "block-seq") && !props.hasNewline)
           onError(props.end, "MISSING_CHAR", "Block collection cannot start on same line with directives-end marker");
       }
-      doc.contents = value ? composeNode.composeNode(ctx, value, props, onError) : composeNode.composeEmptyNode(ctx, props.end, start, null, props, onError);
+      doc.contents = value ? composeNode.composeNode(ctx, value, props, onError) : composeNode.composeEmptyNode(ctx, props.end, start2, null, props, onError);
       const contentEnd = doc.contents.range[2];
       const re = resolveEnd.resolveEnd(end, contentEnd, false, onError);
       if (re.comment)
@@ -5553,9 +5553,9 @@ var require_cst_stringify = __commonJS({
         }
       }
     }
-    function stringifyItem({ start, key, sep: sep8, value }) {
+    function stringifyItem({ start: start2, key, sep: sep8, value }) {
       let res = "";
-      for (const st of start)
+      for (const st of start2)
         res += st.source;
       if (key)
         res += stringifyToken(key);
@@ -6345,8 +6345,8 @@ var require_line_counter = __commonJS({
             return { line: low + 1, col: 1 };
           if (low === 0)
             return { line: 0, col: offset };
-          const start = this.lineStarts[low - 1];
-          return { line: low, col: offset - start + 1 };
+          const start2 = this.lineStarts[low - 1];
+          return { line: low, col: offset - start2 + 1 };
         };
       }
     };
@@ -6726,7 +6726,7 @@ var require_parser = __commonJS({
       *scalar(scalar) {
         if (this.type === "map-value-ind") {
           const prev = getPrevProps(this.peek(2));
-          const start = getFirstKeyStartProps(prev);
+          const start2 = getFirstKeyStartProps(prev);
           let sep8;
           if (scalar.end) {
             sep8 = scalar.end;
@@ -6738,7 +6738,7 @@ var require_parser = __commonJS({
             type: "block-map",
             offset: scalar.offset,
             indent: scalar.indent,
-            items: [{ start, key: scalar, sep: sep8 }]
+            items: [{ start: start2, key: scalar, sep: sep8 }]
           };
           this.onKeyLine = true;
           this.stack[this.stack.length - 1] = map3;
@@ -6813,7 +6813,7 @@ var require_parser = __commonJS({
         if (this.indent >= map3.indent) {
           const atMapIndent = !this.onKeyLine && this.indent === map3.indent;
           const atNextItem = atMapIndent && (it.sep || it.explicitKey) && this.type !== "seq-item-ind";
-          let start = [];
+          let start2 = [];
           if (atNextItem && it.sep && !it.value) {
             const nl = [];
             for (let i = 0; i < it.sep.length; ++i) {
@@ -6833,14 +6833,14 @@ var require_parser = __commonJS({
               }
             }
             if (nl.length >= 2)
-              start = it.sep.splice(nl[1]);
+              start2 = it.sep.splice(nl[1]);
           }
           switch (this.type) {
             case "anchor":
             case "tag":
               if (atNextItem || it.value) {
-                start.push(this.sourceToken);
-                map3.items.push({ start });
+                start2.push(this.sourceToken);
+                map3.items.push({ start: start2 });
                 this.onKeyLine = true;
               } else if (it.sep) {
                 it.sep.push(this.sourceToken);
@@ -6853,8 +6853,8 @@ var require_parser = __commonJS({
                 it.start.push(this.sourceToken);
                 it.explicitKey = true;
               } else if (atNextItem || it.value) {
-                start.push(this.sourceToken);
-                map3.items.push({ start, explicitKey: true });
+                start2.push(this.sourceToken);
+                map3.items.push({ start: start2, explicitKey: true });
               } else {
                 this.stack.push({
                   type: "block-map",
@@ -6871,12 +6871,12 @@ var require_parser = __commonJS({
                   if (includesToken(it.start, "newline")) {
                     Object.assign(it, { key: null, sep: [this.sourceToken] });
                   } else {
-                    const start2 = getFirstKeyStartProps(it.start);
+                    const start3 = getFirstKeyStartProps(it.start);
                     this.stack.push({
                       type: "block-map",
                       offset: this.offset,
                       indent: this.indent,
-                      items: [{ start: start2, key: null, sep: [this.sourceToken] }]
+                      items: [{ start: start3, key: null, sep: [this.sourceToken] }]
                     });
                   }
                 } else if (it.value) {
@@ -6886,10 +6886,10 @@ var require_parser = __commonJS({
                     type: "block-map",
                     offset: this.offset,
                     indent: this.indent,
-                    items: [{ start, key: null, sep: [this.sourceToken] }]
+                    items: [{ start: start2, key: null, sep: [this.sourceToken] }]
                   });
                 } else if (isFlowToken(it.key) && !includesToken(it.sep, "newline")) {
-                  const start2 = getFirstKeyStartProps(it.start);
+                  const start3 = getFirstKeyStartProps(it.start);
                   const key = it.key;
                   const sep8 = it.sep;
                   sep8.push(this.sourceToken);
@@ -6899,10 +6899,10 @@ var require_parser = __commonJS({
                     type: "block-map",
                     offset: this.offset,
                     indent: this.indent,
-                    items: [{ start: start2, key, sep: sep8 }]
+                    items: [{ start: start3, key, sep: sep8 }]
                   });
-                } else if (start.length > 0) {
-                  it.sep = it.sep.concat(start, this.sourceToken);
+                } else if (start2.length > 0) {
+                  it.sep = it.sep.concat(start2, this.sourceToken);
                 } else {
                   it.sep.push(this.sourceToken);
                 }
@@ -6910,7 +6910,7 @@ var require_parser = __commonJS({
                 if (!it.sep) {
                   Object.assign(it, { key: null, sep: [this.sourceToken] });
                 } else if (it.value || atNextItem) {
-                  map3.items.push({ start, key: null, sep: [this.sourceToken] });
+                  map3.items.push({ start: start2, key: null, sep: [this.sourceToken] });
                 } else if (includesToken(it.sep, "map-value-ind")) {
                   this.stack.push({
                     type: "block-map",
@@ -6930,7 +6930,7 @@ var require_parser = __commonJS({
             case "double-quoted-scalar": {
               const fs = this.flowScalar(this.type);
               if (atNextItem || it.value) {
-                map3.items.push({ start, key: fs, sep: [] });
+                map3.items.push({ start: start2, key: fs, sep: [] });
                 this.onKeyLine = true;
               } else if (it.sep) {
                 this.stack.push(fs);
@@ -6954,7 +6954,7 @@ var require_parser = __commonJS({
                     return;
                   }
                 } else if (atMapIndent) {
-                  map3.items.push({ start });
+                  map3.items.push({ start: start2 });
                 }
                 this.stack.push(bv);
                 return;
@@ -7091,7 +7091,7 @@ var require_parser = __commonJS({
             yield* this.step();
           } else if (this.type === "map-value-ind" && parent.type !== "flow-collection") {
             const prev = getPrevProps(parent);
-            const start = getFirstKeyStartProps(prev);
+            const start2 = getFirstKeyStartProps(prev);
             fixFlowSeqItems(fc);
             const sep8 = fc.end.splice(1, fc.end.length);
             sep8.push(this.sourceToken);
@@ -7099,7 +7099,7 @@ var require_parser = __commonJS({
               type: "block-map",
               offset: fc.offset,
               indent: fc.indent,
-              items: [{ start, key: fc, sep: sep8 }]
+              items: [{ start: start2, key: fc, sep: sep8 }]
             };
             this.onKeyLine = true;
             this.stack[this.stack.length - 1] = map3;
@@ -7158,35 +7158,35 @@ var require_parser = __commonJS({
           case "explicit-key-ind": {
             this.onKeyLine = true;
             const prev = getPrevProps(parent);
-            const start = getFirstKeyStartProps(prev);
-            start.push(this.sourceToken);
+            const start2 = getFirstKeyStartProps(prev);
+            start2.push(this.sourceToken);
             return {
               type: "block-map",
               offset: this.offset,
               indent: this.indent,
-              items: [{ start, explicitKey: true }]
+              items: [{ start: start2, explicitKey: true }]
             };
           }
           case "map-value-ind": {
             this.onKeyLine = true;
             const prev = getPrevProps(parent);
-            const start = getFirstKeyStartProps(prev);
+            const start2 = getFirstKeyStartProps(prev);
             return {
               type: "block-map",
               offset: this.offset,
               indent: this.indent,
-              items: [{ start, key: null, sep: [this.sourceToken] }]
+              items: [{ start: start2, key: null, sep: [this.sourceToken] }]
             };
           }
         }
         return null;
       }
-      atIndentedComment(start, indent) {
+      atIndentedComment(start2, indent) {
         if (this.type !== "comment")
           return false;
         if (this.indent <= indent)
           return false;
-        return start.every((st) => st.type === "newline" || st.type === "space");
+        return start2.every((st) => st.type === "newline" || st.type === "space");
       }
       *documentEnd(docEnd) {
         if (this.type !== "doc-mode") {
@@ -7460,19 +7460,19 @@ function parseCues(text3) {
     const lines = block.split("\n").map((l) => l.trim()).filter((l) => l !== "");
     const at2 = lines.findIndex((l) => l.includes("-->"));
     if (at2 < 0) continue;
-    const start = clockSeconds(lines[at2].split("-->")[0]);
+    const start2 = clockSeconds(lines[at2].split("-->")[0]);
     const body = lines.slice(at2 + 1).join(" ");
     if (body.trim() === "" || isBoilerplate(body)) continue;
     const voice = /<v(?:\.[\w-]+)*\s+([^>*]+)>/.exec(body);
     if (voice) {
       const words3 = collapse(stripTags(body));
-      if (words3 !== "") out.push({ speaker: collapse(voice[1]), start, text: words3 });
+      if (words3 !== "") out.push({ speaker: collapse(voice[1]), start: start2, text: words3 });
       continue;
     }
     const plain4 = collapse(stripTags(body));
     if (plain4 === "") continue;
     const named = splitNamed(plain4);
-    out.push(named ? { speaker: named.speaker, start, text: named.text } : { speaker: UNKNOWN_SPEAKER, start, text: plain4 });
+    out.push(named ? { speaker: named.speaker, start: start2, text: named.text } : { speaker: UNKNOWN_SPEAKER, start: start2, text: plain4 });
   }
   return out;
 }
@@ -7511,18 +7511,18 @@ function parseNamedLines(text3) {
       time5 = clockSeconds(line2.replace(/[[\]()]/g, ""));
       continue;
     }
-    let start = time5;
+    let start2 = time5;
     const lead = LEAD_TIME.exec(line2);
     if (lead && lead[0].length < line2.length) {
       const t = leadSeconds(lead[1]);
       if (t !== null) {
-        start = t;
+        start2 = t;
         line2 = line2.slice(lead[0].length);
       }
     }
     const n = splitNamed(line2.replace(/^\*\*([^*\n]+)\*\*:/, "$1:"));
     if (n && n.text.trim() !== "") {
-      out.push({ speaker: n.speaker, start, text: n.text });
+      out.push({ speaker: n.speaker, start: start2, text: n.text });
       named++;
       continue;
     }
@@ -7758,8 +7758,8 @@ function parseRawTranscript(text3) {
       } else unparsed.push(line2);
     }
   }
-  const start = metadata["Scheduled Start"] ?? metadata["Created"] ?? null;
-  const dateMatch = start ? /^(\d{4}-\d{2}-\d{2})/.exec(start) : null;
+  const start2 = metadata["Scheduled Start"] ?? metadata["Created"] ?? null;
+  const dateMatch = start2 ? /^(\d{4}-\d{2}-\d{2})/.exec(start2) : null;
   const attendees = metadata["Attendees"];
   const participants = attendees ? attendees.split(",").map((s) => s.trim()).filter((s) => s !== "") : [];
   let layout = "markdown";
@@ -7942,9 +7942,9 @@ function nullish(input3) {
   return input3 === null || input3 === void 0;
 }
 function cleanRegex(source) {
-  const start = source.startsWith("^") ? 1 : 0;
+  const start2 = source.startsWith("^") ? 1 : 0;
   const end = source.endsWith("$") ? source.length - 1 : source.length;
-  return source.slice(start, end);
+  return source.slice(start2, end);
 }
 function floatSafeRemainder(val, step) {
   const ratio = val / step;
@@ -8321,9 +8321,9 @@ function prefixIssues(path, issues) {
 function unwrapMessage(message) {
   return typeof message === "string" ? message : message?.message;
 }
-function attachSchema(issues, start, inst) {
+function attachSchema(issues, start2, inst) {
   var _a5;
-  for (let i = start; i < issues.length; i++) {
+  for (let i = start2; i < issues.length; i++) {
     (_a5 = issues[i]).schema ?? (_a5.schema = inst);
   }
 }
@@ -28301,9 +28301,9 @@ function nullish3(input3) {
   return input3 === null || input3 === void 0;
 }
 function cleanRegex2(source) {
-  const start = source.startsWith("^") ? 1 : 0;
+  const start2 = source.startsWith("^") ? 1 : 0;
   const end = source.endsWith("$") ? source.length - 1 : source.length;
-  return source.slice(start, end);
+  return source.slice(start2, end);
 }
 function floatSafeRemainder2(val, step) {
   const ratio = val / step;
@@ -28680,9 +28680,9 @@ function prefixIssues2(path, issues) {
 function unwrapMessage2(message) {
   return typeof message === "string" ? message : message?.message;
 }
-function attachSchema2(issues, start, inst) {
+function attachSchema2(issues, start2, inst) {
   var _a5;
-  for (let i = start; i < issues.length; i++) {
+  for (let i = start2; i < issues.length; i++) {
     (_a5 = issues[i]).schema ?? (_a5.schema = inst);
   }
 }
@@ -48552,14 +48552,14 @@ function checkLayers(item, ctx) {
     if (item.layer_text?.[`l${n}`] !== void 0 && item.layers < n) ctx.addIssue({ code: "custom", path: ["layer_text", `l${n}`], message: `layer ${n} text needs layers of ${n} or more` });
   }
 }
-function checkSet(items, ctx, counted) {
+function checkSet(items, ctx, counted, max = ITEM_MAX) {
   if (new Set(items.map((item) => item.id)).size !== items.length) ctx.addIssue({ code: "custom", message: "an item id appears twice" });
-  if (items.length > ITEM_MAX) ctx.addIssue({ code: "custom", message: `more than ${ITEM_MAX} items` });
+  if (items.length > max) ctx.addIssue({ code: "custom", message: `more than ${max} items` });
   if (counted) {
     for (const kind2 of KINDS) {
       const n = items.filter((item) => item.kind === kind2).length;
-      const { min, max } = KIND_COUNT[kind2];
-      if (n < min || n > max) ctx.addIssue({ code: "custom", message: `expected ${min} to ${max} items of kind ${kind2}, got ${n}` });
+      const { min, max: max2 } = KIND_COUNT[kind2];
+      if (n < min || n > max2) ctx.addIssue({ code: "custom", message: `expected ${min} to ${max2} items of kind ${kind2}, got ${n}` });
     }
   }
   const roots = new Set(items.filter((item) => item.kind === "root").map((item) => item.id));
@@ -48577,7 +48577,7 @@ function checkServerMessage(value) {
   if (!schema || type === "call" && !Object.hasOwn(CallSchemas, String(tool))) throw new Error(`server message refused: ${type === "call" ? `no tool ${String(tool)}` : `unexpected message ${String(type)}`}`);
   return parse6(schema, value, "server message refused");
 }
-var SEARCH_LIMIT, MAX_LIMIT, MAX_CONTEXT, KINDS, KIND_COUNT, ITEM_MAX, STATES, KIND_STATES, DIMENSIONS, ITEM_DIMENSIONS, BEHAVIOUR_COUNT, SITUATION_COUNT, STEP_COUNT, CONTROL, ITEM_ID, PROTOCOL, ROOTS_PATH, OUT_OF_DATE, TOOLS, text, PLAIN_PATTERN, TO_PERSON_PATTERN, AGENT_WORDS, PLAIN, line, plain, whole, MeetingSchema, SourceSchema, MeetingEntrySchema, MomentSchema, SpokenSchema, exchange, MomentHitSchema, TurnHitSchema, ContextSchema, SearchArgsSchema, SampleArgsSchema, ContextArgsSchema, sizes, list, LayerTextSchema, MakeIdeaSchema, itemId, common, expresses, StepSchema, RootFieldsSchema, PatternFieldsSchema, BlindSpotFieldsSchema, FrameworkFieldsSchema, RootDraft, PatternDraft, BlindSpotDraft, FrameworkDraft, ProposalSchema, OpportunitySchema, RefSchema, ControlSchema, MeasureSchema, tested, ItemSchema, ProposalsSchema, ItemsSchema, JudgeReportSchema, RunReportSchema, StartSchema, ReplySchema, CallSchemas, ServerSchemas, DeviceMessageSchema, ServerMessageSchema, SampleSchema, ToolResultSchemas, WhySchema, checkItem, checkItems, checkRunReport, kind;
+var SEARCH_LIMIT, MAX_LIMIT, MAX_CONTEXT, KINDS, KIND_COUNT, ITEM_MAX, STATES, KIND_STATES, DIMENSIONS, ITEM_DIMENSIONS, BEHAVIOUR_COUNT, SITUATION_COUNT, STEP_COUNT, CONTROL, ITEM_ID, PROTOCOL, ROOTS_PATH, OUT_OF_DATE, TOOLS, utf8Bytes, UPDATE, text, PLAIN_PATTERN, TO_PERSON_PATTERN, AGENT_WORDS, PLAIN, line, plain, whole, MeetingSchema, SourceSchema, MeetingEntrySchema, MomentSchema, SpokenSchema, exchange, MomentHitSchema, TurnHitSchema, ContextSchema, meetingIds, SearchArgsSchema, SampleArgsSchema, ContextArgsSchema, sizes, list, LayerTextSchema, MakeIdeaSchema, itemId, common, expresses, StepSchema, RootFieldsSchema, PatternFieldsSchema, BlindSpotFieldsSchema, FrameworkFieldsSchema, RootDraft, PatternDraft, BlindSpotDraft, FrameworkDraft, ProposalSchema, OpportunitySchema, RefSchema, ControlSchema, MeasureSchema, tested, ItemSchema, ProposalsSchema, ItemsSchema, reason, OpSchema, EvidenceUpdateSchema, UpdateResultSchema, JudgeReportSchema, RunReportSchema, held, ExistingSchema, ExistingListSchema, start, DiscoverStart, UpdateStart, StartSchema, ReplySchema, CallSchemas, ServerSchemas, DeviceMessageSchema, ServerMessageSchema, SampleSchema, ToolResultSchemas, WhySchema, checkItem, checkItems, checkUpdateResult, checkRunReport, kind;
 var init_src = __esm({
   "../../packages/cf-contract/src/index.ts"() {
     "use strict";
@@ -48601,6 +48601,8 @@ var init_src = __esm({
     ROOTS_PATH = "/v1/roots";
     OUT_OF_DATE = "This CF app is out of date. Update it, then run again. Nothing was changed.";
     TOOLS = ["search_moments", "search_turns", "read_context", "sample_turns"];
+    utf8Bytes = (text3) => new TextEncoder().encode(text3).length;
+    UPDATE = { existing: 30, existingBytes: 6e4, results: 12, new: 6, splitParts: 3 };
     text = external_exports2.string().trim().min(1);
     PLAIN_PATTERN = "^[^|`<>\\[\\]{}\\n\\r]*$";
     TO_PERSON_PATTERN = "^You\\b[^|`<>\\[\\]{}\\n\\r]*$";
@@ -48626,8 +48628,9 @@ var init_src = __esm({
     MomentHitSchema = MomentSchema.extend({ ...exchange, similarity: external_exports2.number().finite() });
     TurnHitSchema = external_exports2.object({ meeting_id: text, date: external_exports2.string(), turn: whole, check: external_exports2.string(), ...exchange, similarity: external_exports2.number().finite() });
     ContextSchema = external_exports2.object({ meeting_id: text, date: external_exports2.string(), turns: external_exports2.array(external_exports2.object({ turn: whole, speaker: external_exports2.string(), person: external_exports2.boolean(), text: external_exports2.string(), check: external_exports2.string() })) });
-    SearchArgsSchema = external_exports2.object({ query: text, limit: external_exports2.number().int().min(1).max(MAX_LIMIT).optional() });
-    SampleArgsSchema = external_exports2.object({ key: external_exports2.string().regex(/^[A-Za-z0-9:_-]{3,80}$/, "key is not letters, digits, : _ or -"), count: external_exports2.number().int().min(1).max(20), exclude: external_exports2.array(external_exports2.object({ meeting_id: text, turn: whole })).max(2e3) });
+    meetingIds = external_exports2.array(text).min(1).max(500).optional();
+    SearchArgsSchema = external_exports2.object({ query: text, limit: external_exports2.number().int().min(1).max(MAX_LIMIT).optional(), meeting_ids: meetingIds });
+    SampleArgsSchema = external_exports2.object({ key: external_exports2.string().regex(/^[A-Za-z0-9:_-]{3,80}$/, "key is not letters, digits, : _ or -"), count: external_exports2.number().int().min(1).max(20), exclude: external_exports2.array(external_exports2.object({ meeting_id: text, turn: whole })).max(2e3), meeting_ids: meetingIds });
     ContextArgsSchema = external_exports2.object({ meeting_id: text, turn: whole, before: external_exports2.number().int().min(0).max(MAX_CONTEXT).optional(), after: external_exports2.number().int().min(0).max(MAX_CONTEXT).optional() });
     sizes = (what, { min, max }) => [min, `expected ${min} to ${max} ${what}`, max];
     list = (item, what, limits) => {
@@ -48689,9 +48692,29 @@ var init_src = __esm({
     });
     ProposalsSchema = external_exports2.array(ProposalSchema, { error: "no items list" }).superRefine((items, ctx) => checkSet(items, ctx, true));
     ItemsSchema = external_exports2.array(ItemSchema, { error: "no items list" }).superRefine((items, ctx) => checkSet(items, ctx, false));
+    reason = plain(PLAIN.why);
+    OpSchema = external_exports2.discriminatedUnion("op", [
+      external_exports2.object({ op: external_exports2.literal("revise"), id: itemId, item: ItemSchema, reason }).strict(),
+      external_exports2.object({ op: external_exports2.literal("merge"), keep: itemId, absorb: external_exports2.array(itemId).min(1).max(5), item: ItemSchema, reason }).strict(),
+      external_exports2.object({ op: external_exports2.literal("split"), id: itemId, into: external_exports2.array(ItemSchema).min(2).max(UPDATE.splitParts), reason }).strict()
+    ]);
+    EvidenceUpdateSchema = external_exports2.object({ id: itemId, opportunities: external_exports2.array(OpportunitySchema), measure: MeasureSchema }).strict();
+    UpdateResultSchema = external_exports2.object({ evidence: external_exports2.array(EvidenceUpdateSchema), ops: external_exports2.array(OpSchema), new: external_exports2.array(ItemSchema).max(UPDATE.new), weakening: external_exports2.array(itemId) }).strict();
     JudgeReportSchema = external_exports2.object({ id: text, pool: whole, outcome: text, turns: whole.optional(), rejected: whole.optional(), repaired: external_exports2.boolean().optional(), reason: external_exports2.string().optional() });
     RunReportSchema = external_exports2.object({ proposer: external_exports2.object({ turns: whole, outcome: text }).optional(), judges: external_exports2.array(JudgeReportSchema) });
-    StartSchema = external_exports2.object({ type: external_exports2.literal("start"), protocol: external_exports2.literal(PROTOCOL, { error: OUT_OF_DATE }), mode: external_exports2.literal("discover"), meetings: external_exports2.array(MeetingEntrySchema).min(1, "no meetings sent"), moments: external_exports2.array(MomentSchema) });
+    held = { protected: external_exports2.boolean(), evidence_calls: external_exports2.array(text).max(500) };
+    ExistingSchema = external_exports2.discriminatedUnion("kind", [RootDraft.extend(held), PatternDraft.extend(held), BlindSpotDraft.extend(held), FrameworkDraft.extend(held)]).superRefine(checkLayers);
+    ExistingListSchema = external_exports2.array(ExistingSchema).min(1, "no existing items sent").max(UPDATE.existing, `more than ${UPDATE.existing} existing items`).superRefine((items, ctx) => {
+      checkSet(items, ctx, false, UPDATE.existing);
+      if (utf8Bytes(JSON.stringify(items)) > UPDATE.existingBytes) ctx.addIssue({ code: "custom", message: `existing items are larger than ${UPDATE.existingBytes} bytes` });
+    });
+    start = { type: external_exports2.literal("start"), protocol: external_exports2.literal(PROTOCOL, { error: OUT_OF_DATE }), meetings: external_exports2.array(MeetingEntrySchema).min(1, "no meetings sent"), moments: external_exports2.array(MomentSchema) };
+    DiscoverStart = external_exports2.object({ ...start, mode: external_exports2.literal("discover") });
+    UpdateStart = external_exports2.object({ ...start, mode: external_exports2.literal("update"), existing: ExistingListSchema, new_calls: external_exports2.array(text).min(1, "no new calls"), evidence_only: external_exports2.boolean() }).superRefine((value, ctx) => {
+      const sent = new Set(value.meetings.map((m) => m.meeting_id));
+      if (value.new_calls.some((id) => !sent.has(id))) ctx.addIssue({ code: "custom", path: ["new_calls"], message: "a new call was not sent" });
+    });
+    StartSchema = external_exports2.discriminatedUnion("mode", [DiscoverStart, UpdateStart]);
     ReplySchema = external_exports2.object({ type: external_exports2.literal("reply"), id: external_exports2.number().int().min(1), ok: external_exports2.boolean(), value: external_exports2.unknown().optional(), error: external_exports2.string().optional() }).refine((reply) => reply.ok || reply.error !== void 0, "a failed reply has no error");
     CallSchemas = {
       search_moments: external_exports2.object({ type: external_exports2.literal("call"), id: external_exports2.number().int().min(1), tool: external_exports2.literal("search_moments"), args: SearchArgsSchema }),
@@ -48701,7 +48724,7 @@ var init_src = __esm({
     };
     ServerSchemas = {
       progress: external_exports2.object({ type: external_exports2.literal("progress"), message: external_exports2.string() }),
-      done: external_exports2.object({ type: external_exports2.literal("done"), items: ItemsSchema, report: external_exports2.lazy(() => RunReportSchema) }),
+      done: external_exports2.union([external_exports2.object({ type: external_exports2.literal("done"), items: ItemsSchema, report: external_exports2.lazy(() => RunReportSchema) }), external_exports2.object({ type: external_exports2.literal("done"), update: UpdateResultSchema, report: external_exports2.lazy(() => RunReportSchema) })]),
       failed: external_exports2.object({ type: external_exports2.literal("failed"), message: external_exports2.string(), report: external_exports2.lazy(() => RunReportSchema) })
     };
     DeviceMessageSchema = external_exports2.union([StartSchema, ReplySchema]);
@@ -48711,6 +48734,7 @@ var init_src = __esm({
     WhySchema = line(PLAIN.why);
     checkItem = (value) => parse6(ItemSchema, value, "item refused");
     checkItems = (value) => parse6(ItemsSchema, value, "items refused");
+    checkUpdateResult = (value) => parse6(UpdateResultSchema, value, "update refused");
     checkRunReport = (value) => parse6(RunReportSchema, value, "run report refused");
     kind = (value) => value && typeof value === "object" ? value : {};
   }
@@ -48775,7 +48799,7 @@ function describeZodError(err) {
   const where = issue3.path.length ? `"${issue3.path.join(".")}"` : "the file";
   return `${where}: ${issue3.message}`;
 }
-var SCHEMA_VERSION, ID_ALPHABET, ID_BODY, ITEM_TYPES, TYPE_PREFIX, ITEM_PREFIXES, ID_PREFIXES, ITEM_ID_PATTERN, CONTROL_CHARS, FORBIDDEN_CHARS, URL_LIKE, AGENT_PHRASES, AGENT_PATTERNS, idOf, itemId2, DATE_RE, INSTANT_RE, dateStr, instant, sha256Hex, schemaVersion, clockText, itemTypeSchema, itemStatusSchema, makeIdeaSchema, nameSchema, aliasesSchema, mechanismSchema, dimensionSchema, layerTextSchema, toPersonSchema, itemDefinitionBase, itemDefinitionSchema, callEvidenceSchema, manualEvidenceSchema, evidenceSchema, DISCARD_REASONS, discardReasonSchema, FIELDS_BY_TYPE, itemSchema, ITEM_KEY_ORDER, EVIDENCE_KEY_ORDER, MANUAL_EVIDENCE_KEY_ORDER, CALL_KEY_ORDER, callFileSchema, redirectStubSchema, looseText, oneLine, MAX_WORKING_ON, MAX_STARTING_CALLS, workingOnSchema, measureSchema, profileFileSchema, actorSchema, pendingActionSchema, JOB_KINDS, jobSchema, attemptSchema, EVENT_KINDS, eventSchema, TXN_STEPS, stepSchema, relPath, txnOpSchema, txnManifestSchema, settingsSchema, writerLockSchema, momentsFileSchema, THRESHOLD_KEYS, assetSchema, rootsRunSchema, nodeCallSchema, nodeSelectionSchema;
+var SCHEMA_VERSION, ID_ALPHABET, ID_BODY, ITEM_TYPES, TYPE_PREFIX, ITEM_PREFIXES, ID_PREFIXES, ITEM_ID_PATTERN, CONTROL_CHARS, FORBIDDEN_CHARS, URL_LIKE, AGENT_PHRASES, AGENT_PATTERNS, idOf, itemId2, DATE_RE, INSTANT_RE, dateStr, instant, sha256Hex, schemaVersion, clockText, itemTypeSchema, itemStatusSchema, makeIdeaSchema, nameSchema, aliasesSchema, mechanismSchema, dimensionSchema, layerTextSchema, toPersonSchema, itemDefinitionBase, itemDefinitionSchema, callEvidenceSchema, manualEvidenceSchema, evidenceSchema, DISCARD_REASONS, discardReasonSchema, FIELDS_BY_TYPE, itemSchema, ITEM_KEY_ORDER, EVIDENCE_KEY_ORDER, MANUAL_EVIDENCE_KEY_ORDER, CALL_KEY_ORDER, callFileSchema, redirectStubSchema, looseText, oneLine, MAX_WORKING_ON, MAX_STARTING_CALLS, workingOnSchema, measureSchema, profileFileSchema, actorSchema, pendingActionSchema, JOB_KINDS, jobSchema, attemptSchema, EVENT_KINDS, eventSchema, TXN_STEPS, stepSchema, relPath, txnOpSchema, txnManifestSchema, settingsSchema, writerLockSchema, momentsFileSchema, THRESHOLD_KEYS, assetSchema, CALL_RESULTS, OP_RESULTS, SUGGESTION_STATES, rootsRunSchema, nodeCallSchema, nodeSelectionSchema;
 var init_schema = __esm({
   "src/core/schema.ts"() {
     "use strict";
@@ -48959,6 +48983,7 @@ var init_schema = __esm({
       discarded_from_status: external_exports.enum(["confirmed", "in_review"]).optional(),
       discard_reason: discardReasonSchema.optional(),
       retired: external_exports.looseObject({ at: instant, by: external_exports.enum(["start_over"]) }).optional(),
+      revisions: external_exports.array(external_exports.looseObject({ at: instant, run_id: idOf("rr"), before_sha256: external_exports.string().regex(/^[0-9a-f]{64}$/) })).optional(),
       make_ideas: external_exports.array(makeIdeaSchema).max(3),
       evidence: external_exports.array(evidenceSchema)
     }).superRefine((item, ctx) => {
@@ -49017,6 +49042,7 @@ var init_schema = __esm({
       "discarded_from_status",
       "discard_reason",
       "retired",
+      "revisions",
       "make_ideas",
       "evidence"
     ];
@@ -49210,6 +49236,8 @@ var init_schema = __esm({
       "item_retired",
       "item_unretired",
       "item_recovered",
+      "item_revised",
+      "suggestion_decided",
       // Kinds an earlier version wrote: still read, never written now.
       "call_extracted",
       "insight_created",
@@ -49319,11 +49347,22 @@ var init_schema = __esm({
       updated_at: instant,
       created_by: external_exports.enum(["person", "agent"])
     });
+    CALL_RESULTS = ["accepted", "dropped", "unavailable"];
+    OP_RESULTS = ["applied", "suggested", "skipped"];
+    SUGGESTION_STATES = ["open", "accepted", "declined", "stale"];
     rootsRunSchema = external_exports.looseObject({
       schema_version: schemaVersion,
       id: idOf("rr"),
       at: instant,
+      mode: external_exports.enum(["discover", "update"]).optional(),
       held: external_exports.array(idOf("c")),
+      calls: external_exports.array(external_exports.looseObject({ call_id: idOf("c"), result: external_exports.enum(CALL_RESULTS) })).optional(),
+      update: external_exports.looseObject({
+        evidence: external_exports.array(external_exports.looseObject({ item_id: itemId2, added: external_exports.number().int().min(0) })),
+        ops: external_exports.array(external_exports.looseObject({ n: external_exports.number().int().min(0), op: external_exports.enum(["revise", "merge", "split"]), ids: external_exports.array(itemId2), reason: external_exports.string(), result: external_exports.enum(OP_RESULTS), why: external_exports.string().nullable(), service: external_exports.unknown() })),
+        weakening: external_exports.array(itemId2),
+        suggestions: external_exports.array(external_exports.looseObject({ n: external_exports.number().int().min(0), state: external_exports.enum(SUGGESTION_STATES), decided_at: instant.nullable() }))
+      }).optional(),
       report: external_exports.record(external_exports.string(), external_exports.unknown()),
       items: external_exports.array(external_exports.looseObject({
         id: external_exports.string(),
@@ -50141,20 +50180,20 @@ function acquireWriterLock(cfRoot, opts) {
       removeIfUnchanged(abs, existing.text, guard);
       continue;
     }
-    const held = existing.lock;
-    if (held.machine_id === opts.machineId) {
-      if (alive(held.pid)) {
+    const held2 = existing.lock;
+    if (held2.machine_id === opts.machineId) {
+      if (alive(held2.pid)) {
         throw new LockError(
-          held.pid === pid ? "Another write is already running in this app. Try again in a moment." : `Another CF program on this computer (process ${held.pid}) is writing to this folder. Wait for it to finish and try again.`
+          held2.pid === pid ? "Another write is already running in this app. Try again in a moment." : `Another CF program on this computer (process ${held2.pid}) is writing to this folder. Wait for it to finish and try again.`
         );
       }
       removeIfUnchanged(abs, existing.text, guard);
       continue;
     }
-    const beat = Date.parse(held.heartbeat_at);
+    const beat = Date.parse(held2.heartbeat_at);
     if (Number.isFinite(beat) && nowMs - beat < staleMs) {
       throw new LockError(
-        `Another device (${held.machine_id}) is writing to this CF folder. It was last active ${minutesAgo(beat, nowMs)}. This app supports one active device per CF folder. Wait a few minutes, or finish the work on that device first.`
+        `Another device (${held2.machine_id}) is writing to this CF folder. It was last active ${minutesAgo(beat, nowMs)}. This app supports one active device per CF folder. Wait a few minutes, or finish the work on that device first.`
       );
     }
     removeIfUnchanged(abs, existing.text, guard);
@@ -50291,15 +50330,15 @@ function handle(abs, initial, now, guard) {
 function clearStaleLocalLock(cfRoot, opts) {
   const cf = openCfRoot(cfRoot);
   const abs = resolveInside(cf, LOCK_REL);
-  const held = readExisting(abs);
-  if (held.kind !== "valid") return false;
-  if (held.lock.machine_id !== opts.machineId) return false;
+  const held2 = readExisting(abs);
+  if (held2.kind !== "valid") return false;
+  if (held2.lock.machine_id !== opts.machineId) return false;
   const alive = opts.pidAlive ?? pidIsAlive;
-  if (alive(held.lock.pid)) return false;
+  if (alive(held2.lock.pid)) return false;
   const guard = { machineId: opts.machineId, pid: process.pid, alive, step: opts.onStep ?? (() => {
   }), waitMs: opts.mutexWaitMs ?? GUARD_WAIT_MS };
   try {
-    return removeIfUnchanged(abs, held.text, guard) === "removed";
+    return removeIfUnchanged(abs, held2.text, guard) === "removed";
   } catch (err) {
     if (err instanceof LockError) return false;
     throw err;
@@ -50478,9 +50517,9 @@ function applyManifest(cf, dir, manifest, hooks = {}) {
     }
   }
   let quarantined = 0;
-  const quarantine = (abs, reason) => {
+  const quarantine = (abs, reason2) => {
     quarantined++;
-    quarantineCopy(cf, abs, manifest.id, quarantined, reason);
+    quarantineCopy(cf, abs, manifest.id, quarantined, reason2);
   };
   ops.forEach((op, n) => {
     if (op.step === "index_pre" && laterDone) {
@@ -50526,14 +50565,14 @@ function applyOne(cf, dir, op, quarantine) {
   }
   unlinkSync2(target);
 }
-function quarantineCopy(cf, abs, txnId, n, reason) {
+function quarantineCopy(cf, abs, txnId, n, reason2) {
   const stem = `${txnId}_${n}`;
   const copy = resolveInside(cf, `workshop/quarantine/${stem}.copy`);
   const note = resolveInside(cf, `workshop/quarantine/${stem}.json`);
   mkdirSync2(dirname2(copy), { recursive: true });
   copyFileSync(abs, copy);
   const rel = abs.startsWith(cf.root + sep3) ? abs.slice(cf.root.length + 1).split(sep3).join("/") : abs;
-  writeFileDurably(note, `${JSON.stringify({ schema_version: SCHEMA_VERSION, original_path: rel, reason, txn_id: txnId }, null, 2)}
+  writeFileDurably(note, `${JSON.stringify({ schema_version: SCHEMA_VERSION, original_path: rel, reason: reason2, txn_id: txnId }, null, 2)}
 `);
 }
 var TxnConflictError, TxnRefusedError, TxnCorruptError, STEP_RANK, ITEMS_PREFIX, ITEM_FILE, FINGERPRINT_FILES, RESERVED_FILES, Txn;
@@ -51159,13 +51198,13 @@ var init_quote_check = __esm({
 // src/core/lifecycle.ts
 import { readFileSync as readFileSync10 } from "node:fs";
 import { join as join11 } from "node:path";
-function meetingIds(evidence) {
+function meetingIds2(evidence) {
   const ids = /* @__PURE__ */ new Set();
   for (const e of evidence) if (e.source === "call") ids.add(e.meeting_id);
   return ids;
 }
 function countMeetings(evidence) {
-  return meetingIds(evidence).size;
+  return meetingIds2(evidence).size;
 }
 function evaluate(item) {
   const meetings = countMeetings(item.evidence);
@@ -51174,7 +51213,7 @@ function evaluate(item) {
   if (item.confirmed_by === "manual" || item.confirmed_by === "person") {
     return { status: "confirmed", confirmed_by: item.confirmed_by, meetings };
   }
-  if (item.type === "blind_spot") return { status: "in_review", confirmed_by: null, meetings };
+  if (item.type === "blind_spot" || item.origin === "roots") return { status: "in_review", confirmed_by: null, meetings };
   if (meetings >= THRESHOLD && holds(item.measure)) return { status: "confirmed", confirmed_by: "threshold", meetings };
   return { status: "in_review", confirmed_by: null, meetings };
 }
@@ -51340,14 +51379,14 @@ function discardItem(cfRoot, itemId3, env = {}) {
   const txnId = commitWorkspace(cfRoot, ws, env, "discard", [{ kind: "item_discarded", itemId: itemId3, detail: { from_status: from } }]);
   return changeResult(w, true, txnId);
 }
-function setDiscardReason(cfRoot, itemId3, reason, env = {}) {
+function setDiscardReason(cfRoot, itemId3, reason2, env = {}) {
   const ws = openWorkspace(cfRoot, env);
   const w = ws.require(itemId3);
   notRetired(w);
   if (w.item.status !== "discarded") throw new CoreError("not_discarded", `${itemId3} is not discarded, so it has no reason to give.`);
-  if ((w.item.discard_reason ?? null) === reason) return changeResult(w, false, null);
-  if (reason === null) delete w.item.discard_reason;
-  else w.item.discard_reason = reason;
+  if ((w.item.discard_reason ?? null) === reason2) return changeResult(w, false, null);
+  if (reason2 === null) delete w.item.discard_reason;
+  else w.item.discard_reason = reason2;
   ws.touch(w);
   const txnId = commitWorkspace(cfRoot, ws, env, "discard-reason", []);
   return changeResult(w, true, txnId);
@@ -51812,22 +51851,22 @@ function goalsOf(cfRoot, today) {
   if (p.result_90d === null && p.measure === null && p.working_on.length === 0) return null;
   return { result_90d: p.result_90d, measure: p.measure, working_on: p.working_on.slice(0, MAX_WORKING_ON), today };
 }
-function setAside(root, from, reason, now) {
+function setAside(root, from, reason2, now) {
   const dir = join13(root, "workshop", "quarantine");
   mkdirSync6(dir, { recursive: true });
   const stamp = instantOf3(now).replace(/[-:]/g, "");
   const name = `${stamp}_starting-point-draft-${randomBytes4(2).toString("hex")}`;
   renameSync4(from, join13(dir, `${name}.copy`));
-  writeFileSync3(join13(dir, `${name}.json`), `${JSON.stringify({ original_path: DROP_FILE, reason }, null, 2)}
+  writeFileSync3(join13(dir, `${name}.json`), `${JSON.stringify({ original_path: DROP_FILE, reason: reason2 }, null, 2)}
 `);
   return `An older starting point draft was set aside in workshop/quarantine/${name}.copy because a newer ${DROP_FILE} was already there.`;
 }
-function giveBack(root, claim3, dropAbs, now, reason) {
+function giveBack(root, claim3, dropAbs, now, reason2) {
   try {
     linkSync2(claim3, dropAbs);
   } catch (err) {
     if (err.code !== "EEXIST") throw err;
-    return setAside(root, claim3, reason, now);
+    return setAside(root, claim3, reason2, now);
   }
   unlinkQuietly2(claim3);
   return null;
@@ -54068,7 +54107,7 @@ var require_extension = __commonJS({
       let inQuotes = false;
       let extensionName;
       let paramName;
-      let start = -1;
+      let start2 = -1;
       let code = -1;
       let end = -1;
       let i = 0;
@@ -54076,45 +54115,45 @@ var require_extension = __commonJS({
         code = header.charCodeAt(i);
         if (extensionName === void 0) {
           if (end === -1 && tokenChars[code] === 1) {
-            if (start === -1) start = i;
+            if (start2 === -1) start2 = i;
           } else if (i !== 0 && (code === 32 || code === 9)) {
-            if (end === -1 && start !== -1) end = i;
+            if (end === -1 && start2 !== -1) end = i;
           } else if (code === 59 || code === 44) {
-            if (start === -1) {
+            if (start2 === -1) {
               throw new SyntaxError(`Unexpected character at index ${i}`);
             }
             if (end === -1) end = i;
-            const name = header.slice(start, end);
+            const name = header.slice(start2, end);
             if (code === 44) {
               push(offers, name, params);
               params = /* @__PURE__ */ Object.create(null);
             } else {
               extensionName = name;
             }
-            start = end = -1;
+            start2 = end = -1;
           } else {
             throw new SyntaxError(`Unexpected character at index ${i}`);
           }
         } else if (paramName === void 0) {
           if (end === -1 && tokenChars[code] === 1) {
-            if (start === -1) start = i;
+            if (start2 === -1) start2 = i;
           } else if (code === 32 || code === 9) {
-            if (end === -1 && start !== -1) end = i;
+            if (end === -1 && start2 !== -1) end = i;
           } else if (code === 59 || code === 44) {
-            if (start === -1) {
+            if (start2 === -1) {
               throw new SyntaxError(`Unexpected character at index ${i}`);
             }
             if (end === -1) end = i;
-            push(params, header.slice(start, end), true);
+            push(params, header.slice(start2, end), true);
             if (code === 44) {
               push(offers, extensionName, params);
               params = /* @__PURE__ */ Object.create(null);
               extensionName = void 0;
             }
-            start = end = -1;
-          } else if (code === 61 && start !== -1 && end === -1) {
-            paramName = header.slice(start, i);
-            start = end = -1;
+            start2 = end = -1;
+          } else if (code === 61 && start2 !== -1 && end === -1) {
+            paramName = header.slice(start2, i);
+            start2 = end = -1;
           } else {
             throw new SyntaxError(`Unexpected character at index ${i}`);
           }
@@ -54123,13 +54162,13 @@ var require_extension = __commonJS({
             if (tokenChars[code] !== 1) {
               throw new SyntaxError(`Unexpected character at index ${i}`);
             }
-            if (start === -1) start = i;
+            if (start2 === -1) start2 = i;
             else if (!mustUnescape) mustUnescape = true;
             isEscaping = false;
           } else if (inQuotes) {
             if (tokenChars[code] === 1) {
-              if (start === -1) start = i;
-            } else if (code === 34 && start !== -1) {
+              if (start2 === -1) start2 = i;
+            } else if (code === 34 && start2 !== -1) {
               inQuotes = false;
               end = i;
             } else if (code === 92) {
@@ -54140,15 +54179,15 @@ var require_extension = __commonJS({
           } else if (code === 34 && header.charCodeAt(i - 1) === 61) {
             inQuotes = true;
           } else if (end === -1 && tokenChars[code] === 1) {
-            if (start === -1) start = i;
-          } else if (start !== -1 && (code === 32 || code === 9)) {
+            if (start2 === -1) start2 = i;
+          } else if (start2 !== -1 && (code === 32 || code === 9)) {
             if (end === -1) end = i;
           } else if (code === 59 || code === 44) {
-            if (start === -1) {
+            if (start2 === -1) {
               throw new SyntaxError(`Unexpected character at index ${i}`);
             }
             if (end === -1) end = i;
-            let value = header.slice(start, end);
+            let value = header.slice(start2, end);
             if (mustUnescape) {
               value = value.replace(/\\/g, "");
               mustUnescape = false;
@@ -54160,17 +54199,17 @@ var require_extension = __commonJS({
               extensionName = void 0;
             }
             paramName = void 0;
-            start = end = -1;
+            start2 = end = -1;
           } else {
             throw new SyntaxError(`Unexpected character at index ${i}`);
           }
         }
       }
-      if (start === -1 || inQuotes || code === 32 || code === 9) {
+      if (start2 === -1 || inQuotes || code === 32 || code === 9) {
         throw new SyntaxError("Unexpected end of input");
       }
       if (end === -1) end = i;
-      const token = header.slice(start, end);
+      const token = header.slice(start2, end);
       if (extensionName === void 0) {
         push(offers, token, params);
       } else {
@@ -54994,16 +55033,16 @@ var require_websocket = __commonJS({
         process.nextTick(cb, err);
       }
     }
-    function receiverOnConclude(code, reason) {
+    function receiverOnConclude(code, reason2) {
       const websocket = this[kWebSocket];
       websocket._closeFrameReceived = true;
-      websocket._closeMessage = reason;
+      websocket._closeMessage = reason2;
       websocket._closeCode = code;
       if (websocket._socket[kWebSocket] === void 0) return;
       websocket._socket.removeListener("data", socketOnData);
       process.nextTick(resume, websocket._socket);
       if (code === 1005) websocket.close();
-      else websocket.close(code, reason);
+      else websocket.close(code, reason2);
     }
     function receiverOnDrain() {
       const websocket = this[kWebSocket];
@@ -55205,34 +55244,34 @@ var require_subprotocol = __commonJS({
     var { tokenChars } = require_validation();
     function parse7(header) {
       const protocols = /* @__PURE__ */ new Set();
-      let start = -1;
+      let start2 = -1;
       let end = -1;
       let i = 0;
       for (i; i < header.length; i++) {
         const code = header.charCodeAt(i);
         if (end === -1 && tokenChars[code] === 1) {
-          if (start === -1) start = i;
+          if (start2 === -1) start2 = i;
         } else if (i !== 0 && (code === 32 || code === 9)) {
-          if (end === -1 && start !== -1) end = i;
+          if (end === -1 && start2 !== -1) end = i;
         } else if (code === 44) {
-          if (start === -1) {
+          if (start2 === -1) {
             throw new SyntaxError(`Unexpected character at index ${i}`);
           }
           if (end === -1) end = i;
-          const protocol2 = header.slice(start, end);
+          const protocol2 = header.slice(start2, end);
           if (protocols.has(protocol2)) {
             throw new SyntaxError(`The "${protocol2}" subprotocol is duplicated`);
           }
           protocols.add(protocol2);
-          start = end = -1;
+          start2 = end = -1;
         } else {
           throw new SyntaxError(`Unexpected character at index ${i}`);
         }
       }
-      if (start === -1 || end !== -1) {
+      if (start2 === -1 || end !== -1) {
         throw new SyntaxError("Unexpected end of input");
       }
-      const protocol = header.slice(start, i);
+      const protocol = header.slice(start2, i);
       if (protocols.has(protocol)) {
         throw new SyntaxError(`The "${protocol}" subprotocol is duplicated`);
       }
@@ -56593,6 +56632,7 @@ function progressView(li) {
   const by = li.item.confirmed_by;
   if (by === "manual") return { meetings, needed: THRESHOLD, label: "Added by you", vouched_by: "manual" };
   if (by === "person") return { meetings, needed: THRESHOLD, label: "Confirmed by you", vouched_by: "person" };
+  if (li.item.origin === "roots") return { meetings, needed: 0, label: `Shown in ${meetings} ${meetings === 1 ? "call" : "calls"}`, vouched_by: null };
   return { meetings, needed: THRESHOLD, label: `${meetings} of ${THRESHOLD}`, vouched_by: null };
 }
 function emptyMessage(updated, confirmed) {
@@ -56622,7 +56662,7 @@ function itemSummary(li, owner = null) {
     first_seen: it.first_seen,
     last_seen: it.last_seen,
     progress,
-    kept_note: it.kept && li.location !== "confirmed" ? `Kept. Needs ${Math.max(0, THRESHOLD - progress.meetings)} more calls.` : null,
+    kept_note: !it.kept || li.location === "confirmed" ? null : it.origin === "roots" ? "Kept. Confirm it when you are sure it is right." : `Kept. Needs ${Math.max(0, THRESHOLD - progress.meetings)} more calls.`,
     make_ideas: it.make_ideas,
     possible_duplicate_of: it.possible_duplicate_of,
     links: it.links,
@@ -56643,21 +56683,21 @@ function quoteContext(call, turnIndex, quote) {
   const turn = call.turns[pos];
   if (!turn) return null;
   let text3 = turn.text;
-  let start = text3.indexOf(quote);
-  if (start < 0) start = text3.toLowerCase().indexOf(quote.toLowerCase());
+  let start2 = text3.indexOf(quote);
+  if (start2 < 0) start2 = text3.toLowerCase().indexOf(quote.toLowerCase());
   if (text3.length > quote.length + TURN_WINDOW * 2) {
-    const from = start < 0 ? 0 : Math.max(0, start - TURN_WINDOW);
-    const to = start < 0 ? TURN_WINDOW * 2 : Math.min(text3.length, start + quote.length + TURN_WINDOW);
+    const from = start2 < 0 ? 0 : Math.max(0, start2 - TURN_WINDOW);
+    const to = start2 < 0 ? TURN_WINDOW * 2 : Math.min(text3.length, start2 + quote.length + TURN_WINDOW);
     const head = from > 0 ? "\u2026" : "";
     text3 = `${head}${text3.slice(from, to)}${to < text3.length ? "\u2026" : ""}`;
-    if (start >= 0) start = start - from + head.length;
+    if (start2 >= 0) start2 = start2 - from + head.length;
   }
   const last2 = call.turns[call.turns.length - 1];
   const at2 = turn.start !== null && last2?.start ? Math.min(1, Math.max(0, turn.start / last2.start)) : null;
   return {
     before: call.turns.slice(Math.max(0, pos - CONTEXT_BEFORE), pos).map((t) => lineOf(t, clip(t.text, NEIGHBOR_CHARS))),
     turn: lineOf(turn, text3),
-    mark: start < 0 ? null : { start, end: start + quote.length },
+    mark: start2 < 0 ? null : { start: start2, end: start2 + quote.length },
     after: call.turns.slice(pos + 1, pos + 1 + CONTEXT_AFTER).map((t) => lineOf(t, clip(t.text, NEIGHBOR_CHARS))),
     at: at2
   };
@@ -56762,8 +56802,8 @@ function listCalls(tree) {
 function latestCallId(tree) {
   const rank = callRank(tree);
   for (const run of [...tree.rootsRuns].reverse()) {
-    const held = run.held.filter((id) => rank.has(id)).sort((a, b) => rank.get(b) - rank.get(a));
-    if (held.length) return held[0];
+    const held2 = run.held.filter((id) => rank.has(id)).sort((a, b) => rank.get(b) - rank.get(a));
+    if (held2.length) return held2[0];
   }
   const newest = listCalls(tree)[0];
   return newest ? newest["call_id"] : null;
@@ -61097,7 +61137,7 @@ function linkedRoundAbort(outer) {
   if (outer?.aborted) controller.abort(outer.reason);
   return {
     signal: controller.signal,
-    abort: (reason) => controller.abort(reason),
+    abort: (reason2) => controller.abort(reason2),
     dispose: () => outer?.removeEventListener("abort", onOuterAbort)
   };
 }
@@ -62905,8 +62945,8 @@ var init_src_BHSMhZ_W = __esm({
             return;
           }
           if (options?.signal?.aborted) {
-            const reason = options.signal.reason;
-            throw reason instanceof SdkError ? reason : new SdkError(SdkErrorCode.RequestTimeout, String(reason));
+            const reason2 = options.signal.reason;
+            throw reason2 instanceof SdkError ? reason2 : new SdkError(SdkErrorCode.RequestTimeout, String(reason2));
           }
           const requestAbort = codec3.era === MODERN_WIRE_REVISION && this._transport.hasPerRequestStream === true ? new AbortController() : void 0;
           const messageId = this._requestMessageId++;
@@ -62928,7 +62968,7 @@ var init_src_BHSMhZ_W = __esm({
           }
           const outbound = this._envelopeOutbound(jsonrpcRequest);
           let responseReceived = false;
-          const cancel = (reason) => {
+          const cancel = (reason2) => {
             if (responseReceived) return;
             this._progressHandlers.delete(messageId);
             if (requestAbort === void 0) {
@@ -62937,7 +62977,7 @@ var init_src_BHSMhZ_W = __esm({
                 method: "notifications/cancelled",
                 params: {
                   requestId: messageId,
-                  reason: String(reason)
+                  reason: String(reason2)
                 }
               }), {
                 relatedRequestId,
@@ -62945,7 +62985,7 @@ var init_src_BHSMhZ_W = __esm({
                 onresumptiontoken
               }).catch((error123) => this._onerror(/* @__PURE__ */ new Error(`Failed to send cancellation: ${error123}`)));
             } else requestAbort.abort();
-            reject(reason instanceof SdkError ? reason : new SdkError(SdkErrorCode.RequestTimeout, String(reason)));
+            reject(reason2 instanceof SdkError ? reason2 : new SdkError(SdkErrorCode.RequestTimeout, String(reason2)));
           };
           this._responseHandlers.set(messageId, (response) => {
             if (options?.signal?.aborted) return;
@@ -72041,9 +72081,9 @@ function itemView(tree, li) {
   };
 }
 function snippet(text3, at2, len) {
-  const start = Math.max(0, at2 - 60);
-  const cut = text3.slice(start, start + len).replace(/\s+/g, " ").trim();
-  return `${start > 0 ? "..." : ""}${cut}${start + len < text3.length ? "..." : ""}`;
+  const start2 = Math.max(0, at2 - 60);
+  const cut = text3.slice(start2, start2 + len).replace(/\s+/g, " ").trim();
+  return `${start2 > 0 ? "..." : ""}${cut}${start2 + len < text3.length ? "..." : ""}`;
 }
 function searchView(tree, query, limit) {
   const q = query.trim().toLowerCase();
@@ -72213,9 +72253,9 @@ function scoreItem(li, q) {
   return { li, score, matched, snippet: snippet2 };
 }
 function snippetAt(text3, at2) {
-  const start = Math.max(0, at2 - 60);
-  const cut = text3.slice(start, start + 200).replace(/\s+/g, " ").trim();
-  return `${start > 0 ? "..." : ""}${cut}${start + 200 < text3.length ? "..." : ""}`;
+  const start2 = Math.max(0, at2 - 60);
+  const cut = text3.slice(start2, start2 + 200).replace(/\s+/g, " ").trim();
+  return `${start2 > 0 ? "..." : ""}${cut}${start2 + 200 < text3.length ? "..." : ""}`;
 }
 function byWeight(a, b) {
   return countMeetings(b.item.evidence) - countMeetings(a.item.evidence) || b.item.last_seen.localeCompare(a.item.last_seen) || a.item.name.localeCompare(b.item.name);
@@ -72710,7 +72750,7 @@ function registerTools(server, ctx) {
       }),
       annotations: WRITE_ANNOTATIONS
     },
-    ({ action, item_id, payload, reason }) => guarded(() => {
+    ({ action, item_id, payload, reason: reason2 }) => guarded(() => {
       if (item_id !== void 0) assertItemId(item_id);
       if (action !== "manual_add" && !item_id) return refuse4(`A ${action} request needs an item_id.`);
       if (action === "manual_add" && !payload) return refuse4("A manual_add request needs a payload.");
@@ -72720,7 +72760,7 @@ function registerTools(server, ctx) {
           action,
           itemId: action === "manual_add" ? null : item_id,
           payload: action === "manual_add" ? payload : null,
-          reason,
+          reason: reason2,
           requestedBy: { type: "agent", name: ctx.agentName }
         },
         { actor: { type: "agent", name: ctx.agentName }, ...env }
@@ -72781,18 +72821,18 @@ function createCfMcpServer(opts) {
   const version3 = opts.version ?? readVersion();
   const server = new McpServer({ name: "cflab", version: version3 }, { instructions: SERVER_INSTRUCTIONS });
   const getClientName = () => server.server.getClientVersion()?.name;
-  let retry;
+  let retry2;
   const connect = () => recordAgentConnect(cf.root, getClientName(), opts.env ?? {}) !== "not_ready";
   server.server.oninitialized = () => {
     if (connect()) return;
-    retry = setInterval(() => {
-      if (connect()) clearInterval(retry);
+    retry2 = setInterval(() => {
+      if (connect()) clearInterval(retry2);
     }, opts.connectRetryMs ?? AGENT_WRITE_INTERVAL_MS);
-    retry.unref();
+    retry2.unref();
   };
   const closed = server.server.onclose;
   server.server.onclose = () => {
-    clearInterval(retry);
+    clearInterval(retry2);
     closed?.();
   };
   registerTools(server, { cfRoot: cf.root, version: version3, agentName: opts.agentName ?? "mcp-agent", getClientName, ...opts.env ? { env: opts.env } : {} });
@@ -73724,9 +73764,9 @@ function entryBytes(bytes, name) {
     if (compressed === 4294967295 || uncompressed === 4294967295) refuse("it is a zip64 file, which is not read.");
     if (uncompressed > MAX_DOCUMENT_XML_BYTES) refuse("its text is larger than 20 MB.");
     if (local + 30 > bytes.length || bytes.readUInt32LE(local) !== LOCAL_HEADER) refuse("its index is damaged.");
-    const start = local + 30 + bytes.readUInt16LE(local + 26) + bytes.readUInt16LE(local + 28);
-    if (start + compressed > bytes.length) refuse("it ends before its text does.");
-    const raw = bytes.subarray(start, start + compressed);
+    const start2 = local + 30 + bytes.readUInt16LE(local + 26) + bytes.readUInt16LE(local + 28);
+    if (start2 + compressed > bytes.length) refuse("it ends before its text does.");
+    const raw = bytes.subarray(start2, start2 + compressed);
     if (method === 0) return raw;
     if (method !== 8) refuse("its text is packed in a way that is not read.");
     try {
@@ -74300,10 +74340,31 @@ function spawnAgent(spec, opts) {
 
 // src/node/model.ts
 var MAX_OUTPUT = 4 * 1024 * 1024;
+var SIGN_IN = "Claude Code is not signed in on this computer. Open Terminal, run claude auth login, then press Find Your Roots again";
+var SIGNED_OUT = /not logged in|please run \/login|failed to authenticate|invalid api key|authentication/i;
+function cleanEnv() {
+  const env = { ...process.env };
+  for (const name of JOB_ENV_REMOVED) delete env[name];
+  return env;
+}
+function claudeSignedIn(claudeBin = "claude") {
+  return new Promise((resolve6) => {
+    const child = spawn2(claudeBin, ["auth", "status", "--json"], { env: cleanEnv(), stdio: ["ignore", "pipe", "ignore"] });
+    let out = "";
+    child.stdout.on("data", (chunk) => out += chunk.toString("utf8"));
+    child.on("error", () => resolve6(false));
+    child.on("close", () => {
+      try {
+        resolve6(JSON.parse(out).loggedIn === true);
+      } catch {
+        resolve6(false);
+      }
+    });
+  });
+}
 function claudeModel(opts = {}) {
   return (system, user) => new Promise((resolve6, reject) => {
-    const env = { ...process.env };
-    for (const name of JOB_ENV_REMOVED) delete env[name];
+    const env = cleanEnv();
     const args = [
       "-p",
       "--model",
@@ -74352,6 +74413,7 @@ function claudeModel(opts = {}) {
       } catch {
         return finish(new Error(code === 0 ? "claude returned something that is not JSON" : `claude exited with code ${code}`));
       }
+      if (parsed?.is_error === true && typeof parsed.result === "string") return finish(new Error(SIGNED_OUT.test(parsed.result) ? SIGN_IN : `Claude Code said: ${parsed.result.slice(0, 200)}`));
       if (parsed?.is_error === true || typeof parsed?.result !== "string") return finish(new Error(`claude returned no result${code ? ` (exit ${code})` : ""}`));
       finish(null, { text: parsed.result, cost: Number(parsed.total_cost_usd ?? 0) });
     });
@@ -74359,10 +74421,10 @@ function claudeModel(opts = {}) {
   });
 }
 function jsonWith(text3, key, accept) {
-  for (let start = text3.indexOf("{"); start >= 0; start = text3.indexOf("{", start + 1)) {
+  for (let start2 = text3.indexOf("{"); start2 >= 0; start2 = text3.indexOf("{", start2 + 1)) {
     let depth = 0;
     let inString = false;
-    for (let index = start; index < text3.length; index += 1) {
+    for (let index = start2; index < text3.length; index += 1) {
       const char = text3[index];
       if (inString) {
         if (char === "\\") index += 1;
@@ -74371,7 +74433,7 @@ function jsonWith(text3, key, accept) {
       else if (char === "{") depth += 1;
       else if (char === "}" && --depth === 0) {
         try {
-          const parsed = JSON.parse(text3.slice(start, index + 1));
+          const parsed = JSON.parse(text3.slice(start2, index + 1));
           if (parsed && typeof parsed === "object" && !Array.isArray(parsed) && accept(parsed[key])) return parsed;
         } catch {
           break;
@@ -74472,29 +74534,30 @@ function meetingFields(context) {
 }
 
 // src/node/prepare.ts
-var DESCRIBE = `You describe one meeting transcript for a later reader who must read every line of it against this description. The subject's turns are marked with \u2726. Describe the meeting; do not describe, judge or interpret the subject.
+var DESCRIBE = `You describe one meeting transcript. The description travels with the meeting to another reader, who studies how one participant, the subject, thinks and decides across many of their meetings. That reader uses your description to know what kind of meeting this was and what the subject was there to do, and then reads the transcript itself; so the description sets the scene and leaves every judgement about the subject to that reader. The subject's turns are marked with \u2726.
 
+Describe:
 - meeting_type: what kind of meeting this is, in a few plain words.
-- topic: what the meeting is actually about, one line.
+- topic: what the meeting is about, in one line.
 - subject_role: the subject's relationship to this topic and these people, in plain words.
-- starting_point: where the conversation begins, the open question or state at the top.
-- end_point: where it lands, what was decided, resolved or left open.
-- attendees: for every other speaker, their role in the meeting and their relation to the subject. Use the speaker label exactly as it appears in the transcript.
-Refer to people by role, never by name, in topic, subject_role, starting_point and end_point.
+- starting_point: where the conversation begins: the open question or the state of things at the top.
+- end_point: where it lands: what was decided, resolved or left open.
+- attendees: for every other speaker, their role in the meeting and their relation to the subject, using the speaker label exactly as it appears in the transcript.
+In topic, subject_role, starting_point and end_point, refer to people by their role rather than their name, because the description is shared beyond this meeting.
 
 Reply with JSON only:
 {"meeting_type": "<words>", "topic": "<line>", "subject_role": "<words>", "starting_point": "<sentence>", "end_point": "<sentence>", "attendees": [{"speaker": "<label>", "role": "<role>", "relation": "<relation>"}]}`;
-var MOMENTS = `You index one meeting transcript so a later reader can find the moments where the subject acted. The subject's turns are marked with \u2726. Every line starts with its turn number in brackets.
+var MOMENTS = `You index one meeting transcript. The index travels with the meeting to another reader, who studies how one participant, the subject, thinks and decides across many of their meetings, and uses your index to find the places worth reading. That reader draws every conclusion from the subject's own words; the index only has to point to the right turns and say plainly what happened there. A neutral index lets their conclusions rest on the transcript rather than on a first impression. The subject's turns are marked with \u2726, and every line starts with its turn number in brackets.
 
-List every moment where the subject, in their own words, did one of these: stated a choice or a decision, stated a position or argued for one, disagreed, raised a concern, asked a question, proposed something, agreed after disagreeing, said they would not pursue or raise something, or said why they want something. Use only what the words show; never infer what the subject meant, felt, intended or achieved. Skip turns that only pass on facts, status or logistics with nothing chosen or argued, and skip small talk.
+List every moment where the subject, in their own words, did one of these: stated a choice or a decision, stated or argued for a position, disagreed, raised a concern, asked a question, proposed something, agreed after disagreeing, said they would not pursue or raise something, or said why they want something. Turns that only pass on facts, status or logistics, with nothing chosen or argued, and small talk are not moments.
 
 For each moment give:
 - turn: the number of the subject's turn.
-- quote: the subject's exact words from that turn, copied character for character, 8 to 60 words, the part that shows the moment.
-- situation: what had just happened that the subject was responding to, one plain sentence. Refer to people by role, never by name.
-- action: what the subject said or did, one plain sentence that anyone reading the transcript would agree with, using the subject's own framing.
+- quote: the subject's exact words from that turn, copied character for character, 8 to 60 words: the part that shows the moment.
+- situation: what had just happened that the subject was responding to, in one plain sentence, referring to people by their role rather than their name.
+- action: what the subject said or did, in one plain sentence that anyone reading the transcript would agree with, using the subject's own framing.
 
-Describe; do not interpret. Never name a trait, habit, pattern, belief, motive, type or category, and never say what the moment shows about the subject.
+Write the situation and the action as a plain account of what was said, the way a careful note-taker would: what the words show, without what the subject meant, felt, intended or achieved. Traits, habits, patterns, beliefs, motives and categories are the other reader's work, drawn across many meetings, so they stay out of the index.
 
 Reply with JSON only:
 {"moments": [{"turn": <number>, "quote": "<exact words>", "situation": "<sentence>", "action": "<sentence>"}]}`;
@@ -74527,9 +74590,9 @@ function readMoments(reply, turns) {
     const quote = text2(item?.quote);
     const situation = text2(item?.situation);
     const action = text2(item?.action);
-    const reason = !item ? "not an object" : !turn ? `no turn ${String(item.turn)}` : !turn.person ? `turn ${turn.n} is not the person's` : !/[\p{L}\p{N}]/u.test(quote) ? "quote has no words" : !normalizeForQuote(turn.text).includes(normalizeForQuote(quote)) ? `quote is not in turn ${turn.n}` : !situation || !action ? "missing situation or action" : null;
-    if (reason) {
-      dropped.push(reason);
+    const reason2 = !item ? "not an object" : !turn ? `no turn ${String(item.turn)}` : !turn.person ? `turn ${turn.n} is not the person's` : !/[\p{L}\p{N}]/u.test(quote) ? "quote has no words" : !normalizeForQuote(turn.text).includes(normalizeForQuote(quote)) ? `quote is not in turn ${turn.n}` : !situation || !action ? "missing situation or action" : null;
+    if (reason2) {
+      dropped.push(reason2);
       continue;
     }
     const key = `${turn.n} ${normalizeForQuote(quote)}`;
@@ -74644,13 +74707,14 @@ init_txn();
 var RUN_EXTRACTOR = "cf-run/2";
 var TYPE_OF = { root: "mental_model", pattern: "pattern", blind_spot: "blind_spot", framework: "framework" };
 var ROOT_DIMENSION = { M: "belief", E: "belief", C: "decision" };
+var protectedItem = (item, used) => item.kept || item.held || item.confirmed_by === "person" || used.has(item.id);
 var sameName2 = (a, b) => a.trim().toLowerCase().replace(/\s+/g, " ") === b.trim().toLowerCase().replace(/\s+/g, " ");
 function applyRootsRun(cfRoot, input3, env = {}) {
   const items = checkItems(input3.items);
   const report = checkRunReport(input3.report);
   for (let round2 = 1; ; round2++) {
     try {
-      return applyOnce(cfRoot, items, report, input3.held, env);
+      return applyOnce(cfRoot, items, report, input3.held, input3.answered ?? new Set(input3.held), env);
     } catch (err) {
       if (!(err instanceof TxnConflictError) || round2 >= 3) throw err;
     }
@@ -74677,9 +74741,9 @@ ${item.fields.steps.map((step, i) => `${i + 1}. ${step.text}${step.required ? ""
 `;
   return [layers.trimEnd(), section].filter(Boolean).join("\n\n");
 }
-function checkOpportunity(ws, held, chosen, callId, turn, quote) {
+function checkOpportunity(ws, held2, chosen, callId, turn, quote) {
   const problem2 = (text3) => ({ problem: text3 });
-  if (!held.has(callId)) return problem2("this call was not sent");
+  if (!held2.has(callId)) return problem2("this call was not sent");
   if (!chosen.has(callId)) return problem2("this call was taken out while the roots were being found");
   const call = ws.callsById.get(callId);
   if (!call) return problem2("there is no such call in this folder");
@@ -74693,83 +74757,553 @@ function checkOpportunity(ws, held, chosen, callId, turn, quote) {
   if (!first.ok) return problem2(first.reason);
   return { turnIndex: first.turnIndex, timestamp: first.timestamp };
 }
-function applyOnce(cfRoot, items, report, heldIds, env) {
+function verify(run, item) {
+  const { ws } = run;
+  const seen = /* @__PURE__ */ new Set();
+  const evidence = [];
+  const opportunities = item.opportunities.map((entry) => {
+    const key = `${entry.meeting_id} ${entry.turn}`;
+    const checked = seen.has(key) ? { problem: "the same turn is listed twice" } : checkOpportunity(ws, run.held, run.chosen, entry.meeting_id, entry.turn, entry.quote);
+    seen.add(key);
+    const problem2 = "problem" in checked ? checked.problem : null;
+    if ("problem" in checked) run.rejected.push({ id: item.id, call_id: entry.meeting_id, turn: entry.turn, reason: checked.problem });
+    else if (entry.state === "fired") {
+      evidence.push(callEvidenceEntry(ws.callsById.get(entry.meeting_id), ws.at, RUN_EXTRACTOR, { quote: entry.quote, turnIndex: checked.turnIndex, timestamp: checked.timestamp, interpretation: entry.why }));
+    }
+    return { call_id: entry.meeting_id, turn: entry.turn, quote: entry.quote, state: entry.state, why: entry.why, ...entry.steps ? { steps: entry.steps } : {}, rejected: problem2 };
+  });
+  return { evidence, opportunities };
+}
+var linkedFields = (run, item) => item.kind === "root" ? item.fields : { ...item.fields, expresses: item.fields.expresses.map((id) => run.itemIds.get(id)).filter((id) => id !== void 0) };
+function recordEntry(item, itemId3, setAside2, fields, opportunities) {
+  return { id: item.id, kind: item.kind, item_id: itemId3, set_aside: setAside2, name: item.name, summary: item.summary, to_person: item.to_person, aliases: item.aliases, layers: item.layers, dimension: item.dimension, layer_text: item.layer_text, make_ideas: item.make_ideas, situations: item.situations, confirm_if: item.confirm_if, disconfirm_if: item.disconfirm_if, fields, measure: item.measure, verdict: item.verdict, opportunities };
+}
+function itemDef(item) {
+  return { type: TYPE_OF[item.kind], name: item.name, aliases: item.aliases, mechanism: item.summary, layers: item.layers, dimension: item.kind === "root" ? ROOT_DIMENSION[item.dimension] : item.dimension, ...item.layer_text ? { layer_text: item.layer_text } : {}, to_person: { mechanism: item.to_person } };
+}
+function evidenceDates(ws, evidence, at2) {
+  const dates = evidence.map((e) => e.source === "call" ? ws.callDate(e.call_id) : null).filter((d) => d !== null).sort();
+  return { first_seen: dates[0] ?? at2.slice(0, 10), last_seen: dates[dates.length - 1] ?? at2.slice(0, 10) };
+}
+function addEvidence(w, evidence) {
+  const known = new Set(w.item.evidence.map((e) => e.source === "call" ? `${e.call_id} ${e.turn_index}` : ""));
+  const fresh = evidence.filter((e) => e.source === "call" && !known.has(`${e.call_id} ${e.turn_index}`));
+  w.item.evidence.push(...fresh);
+  return fresh.length;
+}
+function placeItem(run, item, pool, result) {
+  const { ws } = run;
+  const type = TYPE_OF[item.kind];
+  const { evidence, opportunities } = verify(run, item);
+  const fields = linkedFields(run, item);
+  let itemId3 = null;
+  let setAside2 = null;
+  const discarded = pool.tombstones.find((t) => t.item.type === type && [t.item.name, ...t.item.aliases].some((name) => sameName2(name, item.name)));
+  if (item.measure.too_broad) setAside2 = "it fit too many unrelated moments";
+  else if (discarded) setAside2 = `you discarded ${discarded.id} with this name before`;
+  else if (!evidence.length) setAside2 = "none of its quotes held up";
+  else {
+    const existing = pool.active.find((w) => w.item.type === type && [w.item.name, ...w.item.aliases].some((name) => sameName2(name, item.name)));
+    if (existing) {
+      addEvidence(existing, evidence);
+      existing.item.measure = item.measure;
+      ws.refreshDates(existing, true);
+      ws.touch(existing);
+      itemId3 = existing.id;
+      result.joined.push({ id: item.id, item_id: itemId3 });
+      run.events.push({ kind: "item_evidence_added", itemId: itemId3, detail: { run_id: run.runId, added: evidence.length } });
+    } else {
+      const links = "expresses" in fields ? [...fields.expresses] : [];
+      const w = newItemFile(ws, itemDef(item), { origin: "roots", evidence, make_ideas: item.make_ideas, links, fields, measure: item.measure, ...evidenceDates(ws, evidence, ws.at) });
+      w.body = kindBody({ ...item, fields });
+      itemId3 = w.id;
+      result.created.push({ id: item.id, item_id: itemId3 });
+      run.events.push({ kind: "item_created", itemId: itemId3, detail: { run_id: run.runId, service_id: item.id, origin: "roots", type } });
+    }
+  }
+  if (setAside2) result.skipped.push({ id: item.id, reason: setAside2 });
+  if (itemId3) run.itemIds.set(item.id, itemId3);
+  return recordEntry(item, itemId3, setAside2, fields, opportunities);
+}
+function openRun(cfRoot, env) {
   const ws = openWorkspace(cfRoot, env);
-  const held = new Set(heldIds);
   const selection = readWithHash(cfRoot, NODE_SELECTION_REL);
   const chosen = new Set(selection ? JSON.parse(selection.text).selected ?? [] : []);
-  const at2 = ws.at;
   const runId = generateId("rr", (id) => ws.tree.rootsRuns.some((r) => r.id === id));
-  const events = [];
-  const active2 = ws.active().filter((w) => w.item.origin === "roots");
-  const tombstones = ws.tree.items.filter((i) => i.location === "discarded" && !i.duplicate && !i.statusMismatch && i.item.origin === "roots");
   const result = { runId, txnId: "", created: [], joined: [], skipped: [], rejected: [] };
-  const record3 = [];
-  const itemIds = /* @__PURE__ */ new Map();
+  return { run: { ws, runId, held: /* @__PURE__ */ new Set(), chosen, events: [], rejected: result.rejected, itemIds: /* @__PURE__ */ new Map() }, selection, result };
+}
+function callResults(held2, chosen, answered) {
+  return [...held2].sort().map((call_id) => ({ call_id, result: !chosen.has(call_id) ? "dropped" : answered.has(call_id) ? "accepted" : "unavailable" }));
+}
+function commitRun(cfRoot, env, run, selection, record3, purpose, extra = () => {
+}) {
+  const transitions = run.ws.settleAll();
+  run.events.push(...transitionEvents(transitions, null, CORE_ACTOR));
+  const tx = beginTxn(txnOptions(cfRoot, env, CORE_ACTOR, { purpose }));
+  tx.require(NODE_SELECTION_REL, selection?.sha256 ?? null);
+  run.ws.writeInto(tx);
+  extra(tx);
+  tx.write(rootsRunRelPath(record3.id), `${JSON.stringify(record3, null, 2)}
+`, { base: null });
+  for (const event of run.events) tx.event(event);
+  return tx.commit().id;
+}
+function applyOnce(cfRoot, items, report, heldIds, answered, env) {
+  const { run, selection, result } = openRun(cfRoot, env);
+  run.held = new Set(heldIds);
+  const pool = {
+    active: run.ws.active().filter((w) => w.item.origin === "roots"),
+    tombstones: run.ws.tree.items.filter((i) => i.location === "discarded" && !i.duplicate && !i.statusMismatch && i.item.origin === "roots")
+  };
   const ordered = [...items].sort((a, b) => Number(a.kind !== "root") - Number(b.kind !== "root"));
-  for (const item of ordered) {
-    const type = TYPE_OF[item.kind];
-    const seen = /* @__PURE__ */ new Set();
-    const evidence = [];
-    const opportunities = item.opportunities.map((entry) => {
-      const key = `${entry.meeting_id} ${entry.turn}`;
-      const checked = seen.has(key) ? { problem: "the same turn is listed twice" } : checkOpportunity(ws, held, chosen, entry.meeting_id, entry.turn, entry.quote);
-      seen.add(key);
-      const problem2 = "problem" in checked ? checked.problem : null;
-      if ("problem" in checked) result.rejected.push({ id: item.id, call_id: entry.meeting_id, turn: entry.turn, reason: checked.problem });
-      else if (entry.state === "fired") {
-        evidence.push(callEvidenceEntry(ws.callsById.get(entry.meeting_id), at2, RUN_EXTRACTOR, { quote: entry.quote, turnIndex: checked.turnIndex, timestamp: checked.timestamp, interpretation: entry.why }));
-      }
-      return { call_id: entry.meeting_id, turn: entry.turn, quote: entry.quote, state: entry.state, why: entry.why, ...entry.steps ? { steps: entry.steps } : {}, rejected: problem2 };
-    });
-    const fields = item.kind === "root" ? item.fields : { ...item.fields, expresses: item.fields.expresses.map((id) => itemIds.get(id)).filter((id) => id !== void 0) };
-    let itemId3 = null;
-    let setAside2 = null;
-    const discarded = tombstones.find((t) => t.item.type === type && [t.item.name, ...t.item.aliases].some((name) => sameName2(name, item.name)));
-    if (item.measure.too_broad) setAside2 = "it fit too many unrelated moments";
-    else if (discarded) setAside2 = `you discarded ${discarded.id} with this name before`;
-    else if (!evidence.length) setAside2 = "none of its quotes held up";
-    else {
-      const existing = active2.find((w) => w.item.type === type && [w.item.name, ...w.item.aliases].some((name) => sameName2(name, item.name)));
-      if (existing) {
-        const known = new Set(existing.item.evidence.map((e) => e.source === "call" ? `${e.call_id} ${e.turn_index}` : ""));
-        existing.item.evidence.push(...evidence.filter((e) => e.source === "call" && !known.has(`${e.call_id} ${e.turn_index}`)));
-        existing.item.measure = item.measure;
-        ws.refreshDates(existing, true);
-        ws.touch(existing);
-        itemId3 = existing.id;
-        result.joined.push({ id: item.id, item_id: itemId3 });
-        events.push({ kind: "item_evidence_added", itemId: itemId3, detail: { run_id: runId, added: evidence.length } });
-      } else {
-        const dates = evidence.map((e) => e.source === "call" ? ws.callDate(e.call_id) : null).filter((d) => d !== null).sort();
-        const links = "expresses" in fields ? [...fields.expresses] : [];
-        const w = newItemFile(
-          ws,
-          { type, name: item.name, aliases: item.aliases, mechanism: item.summary, layers: item.layers, dimension: item.kind === "root" ? ROOT_DIMENSION[item.dimension] : item.dimension, ...item.layer_text ? { layer_text: item.layer_text } : {}, to_person: { mechanism: item.to_person } },
-          { origin: "roots", evidence, make_ideas: item.make_ideas, links, fields, measure: item.measure, first_seen: dates[0] ?? at2.slice(0, 10), last_seen: dates[dates.length - 1] ?? at2.slice(0, 10) }
-        );
-        w.body = kindBody({ ...item, fields });
-        itemId3 = w.id;
-        result.created.push({ id: item.id, item_id: itemId3 });
-        events.push({ kind: "item_created", itemId: itemId3, detail: { run_id: runId, service_id: item.id, origin: "roots", type } });
+  const record3 = ordered.map((item) => placeItem(run, item, pool, result));
+  const runRecord = { schema_version: 1, id: run.runId, at: run.ws.at, mode: "discover", held: [...run.held].sort(), calls: callResults(heldIds, run.chosen, answered), report, items: record3 };
+  run.events.push({ kind: "roots_applied", detail: { run_id: run.runId, created: result.created.length, joined: result.joined.length, skipped: result.skipped.length, rejected: result.rejected.length } });
+  result.txnId = commitRun(cfRoot, env, run, selection, runRecord, "store a Find Your Roots run");
+  return result;
+}
+
+// src/core/update.ts
+init_src();
+init_env();
+init_lifecycle();
+init_match();
+
+// src/core/merge.ts
+init_env();
+init_lifecycle();
+init_match();
+init_schema();
+init_paths();
+init_txn();
+var MAX_ALIASES = 8;
+function retryOnConflict(run) {
+  for (let round2 = 1; ; round2++) {
+    try {
+      return run();
+    } catch (err) {
+      if (!(err instanceof TxnConflictError) || round2 >= 3) throw err;
+    }
+  }
+}
+function mergeInto(cfRoot, ws, keepId, dropId, env, extraEvents) {
+  if (keepId === dropId) throw new CoreError("same_item", "An item cannot be merged into itself.");
+  const keep = ws.require(keepId);
+  const drop = ws.require(dropId);
+  for (const w of [keep, drop]) {
+    if (w.item.status === "retired") throw new CoreError("retired", RETIRED);
+    if (w.item.status === "discarded") {
+      throw new CoreError("tombstone", `${w.id} is discarded. Restore it before merging it into another item.`);
+    }
+  }
+  const k = keep.item;
+  const d = drop.item;
+  const origConfirmedAt = k.confirmed_at;
+  const origConfirmedBy = k.confirmed_by;
+  const seen = /* @__PURE__ */ new Set();
+  const evidence = [];
+  for (const e of [...k.evidence, ...d.evidence]) {
+    const key = evidenceKey(e);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    evidence.push(e);
+  }
+  k.evidence = evidence;
+  const aliases = [...k.aliases];
+  const haveAlias = new Set([k.name, ...aliases].map(normalizeName));
+  for (const a of [...d.aliases, d.name]) {
+    const n = normalizeName(a);
+    if (haveAlias.has(n)) continue;
+    if (plainTextProblem(a, "An alias", 2, 60) !== null) continue;
+    if (aliases.length >= MAX_ALIASES) break;
+    aliases.push(a);
+    haveAlias.add(n);
+  }
+  k.aliases = aliases;
+  k.make_ideas = mergeMakeIdeas(k.make_ideas, d.make_ideas);
+  k.layers = Math.max(k.layers, d.layers);
+  k.kept = k.kept || d.kept;
+  k.origin = k.origin === "roots" || d.origin === "roots" ? "roots" : "merge";
+  const not = (id) => id !== keepId && id !== dropId;
+  k.links = [.../* @__PURE__ */ new Set([...k.links, ...d.links])].filter(not);
+  k.possible_duplicate_of = [.../* @__PURE__ */ new Set([...k.possible_duplicate_of, ...d.possible_duplicate_of])].filter(not);
+  k.not_same_as = [.../* @__PURE__ */ new Set([...k.not_same_as, ...d.not_same_as])].filter(not);
+  if (keep.body.trim() === "") keep.body = drop.body;
+  ws.refreshDates(keep, true);
+  k.first_seen = [k.first_seen, d.first_seen].sort()[0];
+  k.last_seen = [k.last_seen, d.last_seen].sort().reverse()[0];
+  const vouched = [k, d].filter((i) => i.status === "confirmed" && (i.confirmed_by === "manual" || i.confirmed_by === "person"));
+  if (vouched.length > 0) {
+    k.held = false;
+    k.confirmed_by = vouched.some((i) => i.confirmed_by === "manual") ? "manual" : "person";
+    k.status = "confirmed";
+    const stamps = vouched.map((i) => i.confirmed_at).filter((s) => s !== null).sort();
+    k.confirmed_at = stamps[0] ?? ws.at;
+  } else {
+    k.held = k.held || d.held;
+    k.confirmed_by = null;
+    k.confirmed_at = null;
+    k.status = "in_review";
+  }
+  ws.touch(keep);
+  const transition = ws.settle(keep);
+  if ((k.type === "blind_spot" || d.type === "blind_spot") && k.status === "confirmed") throw new CoreError("provisional", PROVISIONAL);
+  if (k.status === "confirmed" && k.confirmed_by === "threshold" && origConfirmedBy === "threshold" && origConfirmedAt !== null) {
+    k.confirmed_at = origConfirmedAt;
+  }
+  const tx = beginTxn(txnOptions(cfRoot, env, env.actor ?? defaultActor(ws.tree.settings), { purpose: "merge items" }));
+  ws.remove(drop);
+  ws.writeInto(tx);
+  const stub = redirectStubSchema.parse({ schema_version: SCHEMA_VERSION, id: dropId, redirect_to: keepId, merged_at: ws.at, txn_id: tx.id });
+  tx.write(redirectRelPath(dropId), `${JSON.stringify(stub, null, 2)}
+`, { base: null });
+  pointRedirects(cfRoot, ws.tree.redirects, tx, dropId, keepId);
+  const meetings = countMeetings(k.evidence);
+  const events = [
+    { kind: "items_merged", itemId: keepId, detail: { dropped: dropId, meetings, status: k.status, held: k.held, kept: k.kept } },
+    ...extraEvents
+  ];
+  if (transition) events.push(...transitionEvents([transition], null, CORE_ACTOR));
+  for (const ev of events) tx.event(ev);
+  const res = tx.commit();
+  return { keepId, droppedId: dropId, status: k.status, held: k.held, confirmedBy: k.confirmed_by, meetings, txnId: res.id };
+}
+function pointRedirects(cfRoot, redirects, tx, dropId, keepId) {
+  for (const r of redirects) {
+    if (r.redirect_to !== dropId) continue;
+    const rel = redirectRelPath(r.id);
+    const file3 = readWithHash(cfRoot, rel);
+    if (!file3) continue;
+    tx.write(rel, `${JSON.stringify({ ...JSON.parse(file3.text), redirect_to: keepId }, null, 2)}
+`, { base: file3.sha256 });
+  }
+}
+function resolveDuplicate(cfRoot, input3, answer, env = {}) {
+  if (answer !== "yes" && answer !== "no") throw new CoreError("bad_answer", 'The answer must be "yes" or "no".');
+  return retryOnConflict(() => resolveDuplicateOnce(cfRoot, input3, answer, env));
+}
+function resolveDuplicateOnce(cfRoot, input3, answer, env) {
+  const ws = openWorkspace(cfRoot, env);
+  const a = ws.require(input3.itemId);
+  const b = ws.require(input3.sameAs);
+  if (answer === "yes") {
+    const keepId = input3.keepId ?? input3.sameAs;
+    if (keepId !== input3.itemId && keepId !== input3.sameAs) throw new CoreError("bad_keep", "keepId must be one of the two items.");
+    const dropId = keepId === input3.itemId ? input3.sameAs : input3.itemId;
+    const merged = mergeInto(cfRoot, ws, keepId, dropId, env, []);
+    return { answer, merged, txnId: merged.txnId };
+  }
+  for (const [x, y] of [[a, b], [b, a]]) {
+    x.item.not_same_as = [.../* @__PURE__ */ new Set([...x.item.not_same_as, y.id])];
+    x.item.possible_duplicate_of = x.item.possible_duplicate_of.filter((id) => id !== y.id);
+    ws.touch(x);
+  }
+  const tx = beginTxn(txnOptions(cfRoot, env, env.actor ?? defaultActor(ws.tree.settings), { purpose: "same-as answer" }));
+  ws.writeInto(tx);
+  tx.event({ kind: "same_as_decided", itemId: a.id, detail: { other: b.id, answer: "no" } });
+  return { answer, merged: null, txnId: tx.commit().id };
+}
+
+// src/core/update.ts
+init_schema();
+init_paths();
+init_txn();
+var opIds = (op) => op.op === "revise" ? [op.id] : op.op === "merge" ? [op.keep, ...op.absorb] : [op.id];
+var opItems = (op) => op.op === "split" ? op.into : [op.item];
+function retry(work) {
+  for (let round2 = 1; ; round2++) {
+    try {
+      return work();
+    } catch (err) {
+      if (!(err instanceof TxnConflictError) || round2 >= 3) throw err;
+    }
+  }
+}
+function sumMeasure(before, added) {
+  if (!before) return added;
+  return {
+    fired: before.fired + added.fired,
+    absent: before.absent + added.absent,
+    contradicted: before.contradicted + added.contradicted,
+    meetings_fired: before.meetings_fired + added.meetings_fired,
+    control: added.control ?? before.control,
+    too_broad: added.too_broad
+  };
+}
+function checkOverlap(update) {
+  const seen = /* @__PURE__ */ new Set();
+  for (const op of update.ops) {
+    for (const id of opIds(op)) {
+      if (seen.has(id)) throw new CoreError("bad_update", `The CF service sent two changes to ${id}, so nothing was stored.`);
+      seen.add(id);
+    }
+  }
+}
+var Changes = class {
+  constructor(run, record3) {
+    this.run = run;
+    this.record = record3;
+  }
+  run;
+  record;
+  pending = [];
+  redirects = [];
+  live(id, sent) {
+    const w = this.run.ws.get(id);
+    const redirected = this.run.ws.tree.redirects.some((r) => r.id === id);
+    return w && !redirected && sent.has(id) && isActive(w.item.status) && w.item.origin === "roots" && !this.run.ws.removed.has(id) ? w : void 0;
+  }
+  revise(w, item, verified) {
+    const { ws } = this.run;
+    const before = w.orig?.sha256;
+    const fields = linkedFields(this.run, item);
+    w.item = {
+      ...w.item,
+      name: item.name,
+      aliases: item.aliases,
+      mechanism: item.summary,
+      to_person: { mechanism: item.to_person },
+      layers: item.layers,
+      dimension: item.kind === "root" ? ROOT_DIMENSION[item.dimension] : item.dimension,
+      make_ideas: item.make_ideas,
+      fields,
+      measure: item.measure,
+      links: "expresses" in fields ? [...fields.expresses] : [],
+      evidence: [...w.item.evidence.filter((e) => e.source !== "call"), ...verified.evidence]
+    };
+    if (before) w.item.revisions = [...w.item.revisions ?? [], { at: ws.at, run_id: this.run.runId, before_sha256: before }];
+    w.body = kindBody({ ...item, fields });
+    ws.refreshDates(w, false);
+    ws.touch(w);
+    this.pending.push({ w, item });
+    this.record.push(recordEntry(item, w.id, null, fields, verified.opportunities));
+  }
+  absorb(keep, drop) {
+    const aliases = [...keep.item.aliases];
+    const have = new Set([keep.item.name, ...aliases].map(normalizeName));
+    for (const name of [drop.item.name, ...drop.item.aliases]) {
+      if (aliases.length >= 8 || have.has(normalizeName(name)) || plainTextProblem(name, "An alias", 2, 60) !== null) continue;
+      aliases.push(name);
+      have.add(normalizeName(name));
+    }
+    keep.item.aliases = aliases;
+    this.run.ws.remove(drop);
+    this.redirects.push({ from: drop.id, to: keep.id });
+    this.run.events.push({ kind: "items_merged", itemId: keep.id, detail: { dropped: drop.id, run_id: this.run.runId } });
+  }
+  apply(op, n, sent, result) {
+    const works = opIds(op).map((id) => this.live(id, sent));
+    const gone = opIds(op).find((_, i) => !works[i]);
+    if (gone) return `${gone} is no longer an item from Find Your Roots in your folder`;
+    const items = opItems(op);
+    const verified = items.map((item) => verify(this.run, item));
+    const empty = verified.findIndex((v, i) => !v.evidence.length && (op.op !== "split" || i === 0));
+    if (empty >= 0) return `none of the quotes for ${items[empty].name} held up`;
+    if (op.op === "revise") this.revise(works[0], op.item, verified[0]);
+    else if (op.op === "merge") {
+      this.revise(works[0], op.item, verified[0]);
+      works.slice(1).forEach((drop) => this.absorb(works[0], drop));
+    } else {
+      this.revise(works[0], op.into[0], verified[0]);
+      for (const part of op.into.slice(1)) {
+        const entry = placeItem(this.run, part, { active: [], tombstones: [] }, result);
+        this.record.push(entry);
+        const created = entry.item_id ? this.run.ws.get(entry.item_id) : void 0;
+        if (created) this.pending.push({ w: created, item: part });
       }
     }
-    if (setAside2) result.skipped.push({ id: item.id, reason: setAside2 });
-    if (itemId3) itemIds.set(item.id, itemId3);
-    record3.push({ id: item.id, kind: item.kind, item_id: itemId3, set_aside: setAside2, name: item.name, summary: item.summary, to_person: item.to_person, aliases: item.aliases, layers: item.layers, dimension: item.dimension, layer_text: item.layer_text, make_ideas: item.make_ideas, situations: item.situations, confirm_if: item.confirm_if, disconfirm_if: item.disconfirm_if, fields, measure: item.measure, verdict: item.verdict, opportunities });
+    this.run.events.push({ kind: "item_revised", itemId: opIds(op)[0], detail: { run_id: this.run.runId, op: op.op, n } });
+    return null;
   }
-  const transitions = ws.settleAll();
-  events.push(...transitionEvents(transitions, null, CORE_ACTOR));
-  const run = { schema_version: 1, id: runId, at: at2, held: [...held].sort(), report, items: record3 };
-  const tx = beginTxn(txnOptions(cfRoot, env, CORE_ACTOR, { purpose: "store a Find Your Roots run" }));
-  tx.require(NODE_SELECTION_REL, selection?.sha256 ?? null);
-  ws.writeInto(tx);
-  tx.write(rootsRunRelPath(runId), `${JSON.stringify(run, null, 2)}
+  relink() {
+    for (const { w, item } of this.pending) {
+      if (this.run.ws.removed.has(w.id)) continue;
+      const fields = linkedFields(this.run, item);
+      w.item.fields = fields;
+      w.item.links = "expresses" in fields ? [...fields.expresses] : [];
+      w.body = kindBody({ ...item, fields });
+    }
+  }
+  writeRedirects(cfRoot, tx) {
+    for (const { from, to } of this.redirects) {
+      const stub = redirectStubSchema.parse({ schema_version: SCHEMA_VERSION, id: from, redirect_to: to, merged_at: this.run.ws.at, txn_id: tx.id });
+      tx.write(redirectRelPath(from), `${JSON.stringify(stub, null, 2)}
 `, { base: null });
-  for (const event of events) tx.event(event);
-  tx.event({ kind: "roots_applied", detail: { run_id: runId, created: result.created.length, joined: result.joined.length, skipped: result.skipped.length, rejected: result.rejected.length } });
-  result.txnId = tx.commit().id;
+      pointRedirects(cfRoot, this.run.ws.tree.redirects, tx, from, to);
+    }
+  }
+};
+function applyUpdateRun(cfRoot, input3, env = {}) {
+  const update = checkUpdateResult(input3.update);
+  const report = checkRunReport(input3.report);
+  checkOverlap(update);
+  return retry(() => applyOnce2(cfRoot, update, report, input3, env));
+}
+function applyOnce2(cfRoot, update, report, input3, env) {
+  const { run, selection, result: base } = openRun(cfRoot, env);
+  run.held = new Set(input3.held);
+  const { ws } = run;
+  const sent = new Set(input3.sent);
+  const result = { ...base, grown: [], applied: 0, suggested: 0, unapplied: [], weakening: [] };
+  const record3 = [];
+  const changes = new Changes(run, record3);
+  for (const id of sent) {
+    const w = changes.live(id, sent);
+    if (!w) continue;
+    run.itemIds.set(id, id);
+  }
+  const grown = [];
+  for (const entry of update.evidence) {
+    const w = changes.live(entry.id, sent);
+    if (!w) continue;
+    const { evidence } = verify(run, { id: entry.id, opportunities: entry.opportunities });
+    const added = addEvidence(w, evidence);
+    w.item.measure = sumMeasure(w.item.measure, entry.measure);
+    ws.refreshDates(w, true);
+    ws.touch(w);
+    grown.push({ item_id: w.id, added });
+    if (added) run.events.push({ kind: "item_evidence_added", itemId: w.id, detail: { run_id: run.runId, added } });
+  }
+  result.grown = grown;
+  const used = new Set(ws.tree.assets.flatMap((asset) => asset.source_items));
+  const ops = [];
+  const suggestions = [];
+  update.ops.forEach((op, n) => {
+    const ids = opIds(op);
+    const row = { n, op: op.op, ids, reason: op.reason, service: op };
+    const guarded2 = ids.map((id) => changes.live(id, sent)).some((w) => w !== void 0 && protectedItem(w.item, used));
+    if (guarded2) {
+      ops.push({ ...row, result: "suggested", why: null });
+      suggestions.push({ n, state: "open", decided_at: null });
+      result.suggested += 1;
+      return;
+    }
+    const why = changes.apply(op, n, sent, result);
+    ops.push({ ...row, result: why ? "skipped" : "applied", why });
+    if (why) result.unapplied.push({ n, why });
+    else result.applied += 1;
+  });
+  const pool = {
+    active: ws.active().filter((w) => w.item.origin === "roots" && !ws.removed.has(w.id)),
+    tombstones: ws.tree.items.filter((i) => i.location === "discarded" && !i.duplicate && !i.statusMismatch && i.item.origin === "roots")
+  };
+  for (const item of [...update.new].sort((a, b) => Number(a.kind !== "root") - Number(b.kind !== "root"))) {
+    const entry = placeItem(run, item, pool, result);
+    record3.push(entry);
+    const created = entry.item_id && result.created.some((c) => c.item_id === entry.item_id) ? ws.get(entry.item_id) : void 0;
+    if (created) changes.pending.push({ w: created, item });
+  }
+  changes.relink();
+  result.weakening = update.weakening.filter((id) => changes.live(id, sent));
+  const runRecord = {
+    schema_version: 1,
+    id: run.runId,
+    at: ws.at,
+    mode: "update",
+    held: [...run.held].sort(),
+    calls: callResults(input3.held, run.chosen, input3.answered),
+    report,
+    items: record3,
+    update: { evidence: grown, ops, weakening: result.weakening, suggestions }
+  };
+  run.events.push({ kind: "roots_applied", detail: { run_id: run.runId, mode: "update", grown: grown.length, applied: result.applied, suggested: result.suggested, created: result.created.length, rejected: result.rejected.length } });
+  result.txnId = commitRun(cfRoot, env, run, selection, runRecord, "store a Find Your Roots update", (tx) => changes.writeRedirects(cfRoot, tx));
   return result;
+}
+function decideSuggestion(cfRoot, runId, n, accept, env = {}) {
+  return retry(() => decideOnce(cfRoot, runId, n, accept, env));
+}
+function decideOnce(cfRoot, runId, n, accept, env) {
+  const rel = rootsRunRelPath(runId);
+  const file3 = readWithHash(cfRoot, rel);
+  if (!file3) throw new CoreError("no_such_run", `There is no run ${runId}.`);
+  const saved = JSON.parse(file3.text);
+  const suggestion = saved.update?.suggestions.find((s) => s.n === n);
+  const row = saved.update?.ops.find((o) => o.n === n);
+  if (!suggestion || !row) throw new CoreError("no_such_suggestion", `Run ${runId} has no suggestion ${n}.`);
+  if (suggestion.state !== "open") throw new CoreError("decided", `That suggestion was already ${suggestion.state}.`);
+  const { run, selection, result } = openRun(cfRoot, env);
+  run.held = new Set(saved.held);
+  const op = row.service;
+  const sent = new Set(opIds(op));
+  const record3 = [];
+  const changes = new Changes(run, record3);
+  for (const w of run.ws.active()) run.itemIds.set(w.id, w.id);
+  let state = "declined";
+  if (accept) {
+    const updateResult = { ...result, grown: [], applied: 0, suggested: 0, unapplied: [], weakening: [] };
+    const why = changes.apply(op, n, sent, updateResult);
+    if (why) throw new CoreError("stale_suggestion", `This suggestion can no longer be applied: ${why}. Decline it instead.`);
+    changes.relink();
+    state = "accepted";
+  }
+  suggestion.state = state;
+  suggestion.decided_at = run.ws.at;
+  saved.items = [...saved.items, ...record3];
+  run.events.push(...transitionEvents(run.ws.settleAll(), null, CORE_ACTOR));
+  const tx = beginTxn(txnOptions(cfRoot, env, env.actor ?? CORE_ACTOR, { purpose: `${state} a suggested change` }));
+  tx.require(NODE_SELECTION_REL, selection?.sha256 ?? null);
+  run.ws.writeInto(tx);
+  changes.writeRedirects(cfRoot, tx);
+  tx.write(rel, `${JSON.stringify(saved, null, 2)}
+`, { base: file3.sha256 });
+  for (const event of run.events) tx.event(event);
+  tx.event({ kind: "suggestion_decided", detail: { run_id: runId, n, state } });
+  return { runId, n, state, txnId: tx.commit().id };
+}
+
+// src/node/plan.ts
+init_src();
+init_lifecycle();
+var callsOf = (evidence) => [...new Set(evidence.flatMap((e) => e.source === "call" ? [e.call_id] : []))].sort();
+function usedCalls(tree) {
+  return new Set(tree.rootsRuns.flatMap((run) => (run.calls ?? []).filter((c) => c.result === "accepted").map((c) => c.call_id)));
+}
+function planRun(tree, held2) {
+  const active2 = tree.items.filter((i) => !i.duplicate && !i.statusMismatch && isActive(i.item.status) && i.item.origin === "roots");
+  if (!active2.length) return { mode: "discover" };
+  const used = usedCalls(tree);
+  const fresh = held2.filter((id) => !used.has(id));
+  if (!fresh.length) return { mode: "none", message: "every chosen call was already used by an earlier run. Add a new call, or press Start Over to find everything again" };
+  const entries = /* @__PURE__ */ new Map();
+  for (const run of tree.rootsRuns) for (const entry of run.items) if (entry.item_id) entries.set(entry.item_id, entry);
+  const assets = new Set(tree.assets.flatMap((asset) => asset.source_items));
+  const candidates = active2.map((loaded) => ({ loaded, entry: entries.get(loaded.id) })).filter((c) => c.entry !== void 0).sort((a, b) => Number(a.entry.kind !== "root") - Number(b.entry.kind !== "root") || (b.loaded.item.measure?.meetings_fired ?? 0) - (a.loaded.item.measure?.meetings_fired ?? 0) || a.loaded.id.localeCompare(b.loaded.id));
+  const chosen = candidates.slice(0, UPDATE.existing);
+  const roots = new Set(chosen.filter((c) => c.entry.kind === "root").map((c) => c.loaded.id));
+  const existing = [];
+  let bytes = 2;
+  for (const { loaded, entry } of chosen) {
+    const item = loaded.item;
+    const fields = entry.kind === "root" ? entry.fields : { ...entry.fields, expresses: (entry.fields.expresses ?? []).filter((id) => roots.has(id)) };
+    const parsed = ExistingSchema.safeParse({
+      id: loaded.id,
+      kind: entry.kind,
+      name: item.name,
+      aliases: item.aliases,
+      summary: item.mechanism,
+      to_person: item.to_person?.mechanism ?? entry.to_person,
+      layers: entry.kind === "root" ? 4 : item.layers,
+      ...entry.layer_text ? { layer_text: entry.layer_text } : {},
+      dimension: entry.dimension,
+      situations: entry.situations,
+      confirm_if: entry.confirm_if,
+      disconfirm_if: entry.disconfirm_if,
+      make_ideas: item.make_ideas,
+      fields,
+      protected: protectedItem(item, assets),
+      evidence_calls: callsOf(item.evidence)
+    });
+    if (!parsed.success) continue;
+    const size = utf8Bytes(JSON.stringify(parsed.data)) + 1;
+    if (bytes + size > UPDATE.existingBytes) break;
+    bytes += size;
+    existing.push(parsed.data);
+  }
+  if (!existing.length) return { mode: "discover" };
+  const left_out = active2.length - existing.length;
+  return { mode: "update", existing, new_calls: fresh, evidence_only: left_out > 0, left_out };
 }
 
 // src/node/search.ts
@@ -76622,57 +77156,71 @@ var NodeSearch = class {
     }
   }
   stillChosen;
+  answered = /* @__PURE__ */ new Set();
   held = /* @__PURE__ */ new Map();
   moments = new MiniSearch({ fields: ["text"], storeFields: ["meeting_id", "turn", "index"] });
   windows = new MiniSearch({ fields: ["text"], storeFields: ["meeting_id", "turn"] });
   meetings() {
-    return [...this.held.values()].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)).map((held) => held.entry);
+    return [...this.held.values()].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)).map((held2) => held2.entry);
   }
   allMoments() {
-    return [...this.held.values()].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)).flatMap((held) => held.moments);
+    return [...this.held.values()].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)).flatMap((held2) => held2.moments);
   }
-  searchMoments(query, limit) {
+  within(meetingIds3) {
     const chosen = this.stillChosen();
-    return this.moments.search(query, { filter: (hit) => chosen.has(hit.meeting_id) }).slice(0, bounded(limit, SEARCH_LIMIT, MAX_LIMIT)).map((hit) => {
-      const held = this.held.get(hit.meeting_id);
-      const moment = held.moments[hit.index];
-      return { ...moment, ...exchange2(held.turns, moment.turn), similarity: round(hit.score) };
-    });
+    if (!meetingIds3) return chosen;
+    const outside = meetingIds3.find((id) => !chosen.has(id) || !this.held.has(id));
+    if (outside) throw new Error(`no sent call ${outside}`);
+    return new Set(meetingIds3);
   }
-  searchTurns(query, limit) {
-    const chosen = this.stillChosen();
-    return this.windows.search(query, { filter: (hit) => chosen.has(hit.meeting_id) }).slice(0, bounded(limit, SEARCH_LIMIT, MAX_LIMIT)).map((hit) => {
-      const held = this.held.get(hit.meeting_id);
+  seen(hits) {
+    for (const hit of hits) this.answered.add(hit.meeting_id);
+    return hits;
+  }
+  searchMoments(query, limit, meetingIds3) {
+    const chosen = this.within(meetingIds3);
+    return this.seen(this.moments.search(query, { filter: (hit) => chosen.has(hit.meeting_id) }).slice(0, bounded(limit, SEARCH_LIMIT, MAX_LIMIT)).map((hit) => {
+      const held2 = this.held.get(hit.meeting_id);
+      const moment = held2.moments[hit.index];
+      return { ...moment, ...exchange2(held2.turns, moment.turn), similarity: round(hit.score) };
+    }));
+  }
+  searchTurns(query, limit, meetingIds3) {
+    const chosen = this.within(meetingIds3);
+    return this.seen(this.windows.search(query, { filter: (hit) => chosen.has(hit.meeting_id) }).slice(0, bounded(limit, SEARCH_LIMIT, MAX_LIMIT)).map((hit) => {
+      const held2 = this.held.get(hit.meeting_id);
       const turn = hit.turn;
-      return { meeting_id: held.id, date: held.date, turn, check: turnCheck(held.turns[turn].text), ...exchange2(held.turns, turn), similarity: round(hit.score) };
-    });
+      return { meeting_id: held2.id, date: held2.date, turn, check: turnCheck(held2.turns[turn].text), ...exchange2(held2.turns, turn), similarity: round(hit.score) };
+    }));
   }
   context(meetingId, turn, before = 8, after = 4) {
-    const held = this.held.get(meetingId);
-    if (!held || !this.stillChosen().has(meetingId)) throw new Error(`no sent call ${meetingId}`);
-    if (!Number.isInteger(turn) || !held.turns[turn]) throw new Error(`call ${meetingId} has no turn ${turn}`);
+    const held2 = this.held.get(meetingId);
+    if (!held2 || !this.stillChosen().has(meetingId)) throw new Error(`no sent call ${meetingId}`);
+    if (!Number.isInteger(turn) || !held2.turns[turn]) throw new Error(`call ${meetingId} has no turn ${turn}`);
+    this.answered.add(meetingId);
     const from = Math.max(0, turn - Math.min(Math.max(0, Math.trunc(before)), MAX_CONTEXT));
-    const to = Math.min(held.turns.length - 1, turn + Math.min(Math.max(0, Math.trunc(after)), MAX_CONTEXT));
-    return { meeting_id: meetingId, date: held.date, turns: held.turns.slice(from, to + 1).map((t) => ({ turn: t.n, speaker: t.speaker, person: t.person, text: t.text, check: turnCheck(t.text) })) };
+    const to = Math.min(held2.turns.length - 1, turn + Math.min(Math.max(0, Math.trunc(after)), MAX_CONTEXT));
+    return { meeting_id: meetingId, date: held2.date, turns: held2.turns.slice(from, to + 1).map((t) => ({ turn: t.n, speaker: t.speaker, person: t.person, text: t.text, check: turnCheck(t.text) })) };
   }
-  sampleTurns(key, count, exclude) {
-    const chosen = this.stillChosen();
+  sampleTurns(key, count, exclude, meetingIds3) {
+    const chosen = this.within(meetingIds3);
     const skip = new Set(exclude.map((ref) => `${ref.meeting_id} ${ref.turn}`));
-    const universe = [...this.held.values()].filter((held) => chosen.has(held.id)).sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)).flatMap((held) => held.turns.filter((t) => t.person && words2(t.text) >= CONTROL.words && !skip.has(`${held.id} ${t.n}`)).map((t) => ({ held, turn: t.n })));
+    const universe = [...this.held.values()].filter((held2) => chosen.has(held2.id)).sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)).flatMap((held2) => held2.turns.filter((t) => t.person && words2(t.text) >= CONTROL.words && !skip.has(`${held2.id} ${t.n}`)).map((t) => ({ held: held2, turn: t.n })));
     const order = [...universe];
     for (let i = order.length - 1; i > 0; i -= 1) {
       const j = Math.floor(draw(key, i) * (i + 1));
       [order[i], order[j]] = [order[j], order[i]];
     }
-    const turns = order.slice(0, Math.max(0, Math.min(count, 20))).map(({ held, turn }) => ({ meeting_id: held.id, date: held.date, turn, check: turnCheck(held.turns[turn].text), ...exchange2(held.turns, turn), similarity: 0 }));
-    return { eligible: universe.length, turns };
+    const turns = order.slice(0, Math.max(0, Math.min(count, 20))).map(({ held: held2, turn }) => ({ meeting_id: held2.id, date: held2.date, turn, check: turnCheck(held2.turns[turn].text), ...exchange2(held2.turns, turn), similarity: 0 }));
+    return { eligible: universe.length, turns: this.seen(turns) };
   }
   answer(tool, args) {
     if (!TOOLS.includes(tool)) throw new Error(`no tool ${String(tool)}`);
     if (tool === "read_context") return this.context(String(args.meeting_id), Number(args.turn), args.before ?? 8, args.after ?? 4);
-    if (tool === "sample_turns") return this.sampleTurns(String(args.key), Number(args.count), args.exclude ?? []);
+    const scope = args.meeting_ids;
+    if (tool === "sample_turns") return this.sampleTurns(String(args.key), Number(args.count), args.exclude ?? [], scope);
     const query = String(args.query ?? "");
-    return tool === "search_moments" ? this.searchMoments(query, args.limit) : this.searchTurns(query, args.limit);
+    return tool === "search_moments" ? this.searchMoments(query, args.limit, scope) : this.searchTurns(query, args.limit, scope);
   }
 };
 
@@ -76693,10 +77241,13 @@ function refusalOf(status) {
   return `The CF service refused the connection (HTTP ${status}).`;
 }
 async function sendRoots(cfRoot, link, print, env = {}) {
-  const { held, waiting } = heldCalls(cfRoot);
+  const { held: held2, waiting } = heldCalls(cfRoot);
   if (waiting.length) return { ok: false, message: `${waiting.length} chosen call${waiting.length === 1 ? " is" : "s are"} not ready yet; prepare them first` };
-  if (!held.length) return { ok: false, message: "no call is chosen to send" };
-  const search = new NodeSearch(readCfTree(cfRoot), held, () => readSelection(cfRoot).chosen);
+  if (!held2.length) return { ok: false, message: "no call is chosen to send" };
+  const tree = readCfTree(cfRoot);
+  const plan = planRun(tree, held2);
+  if (plan.mode === "none") return { ok: false, message: plan.message };
+  const search = new NodeSearch(tree, held2, () => readSelection(cfRoot).chosen);
   const outcome = await new Promise((resolve6, reject) => {
     const socket = new wrapper_default(link.url, { headers: { Authorization: `Bearer ${link.token}` } });
     let settled = false;
@@ -76716,8 +77267,20 @@ async function sendRoots(cfRoot, link, print, env = {}) {
         socket.close();
         return;
       }
-      print(`sending ${meetings.length} calls and ${moments.length} moments`);
-      put({ type: "start", protocol: PROTOCOL, mode: "discover", meetings, moments });
+      if (plan.mode === "update") {
+        const newCalls = plan.new_calls.filter((id) => chosen.has(id));
+        if (!newCalls.length) {
+          finish(() => reject(new Error("every new call was taken out before anything was sent")));
+          socket.close();
+          return;
+        }
+        print(`sending ${meetings.length} calls (${newCalls.length} new), ${moments.length} moments and the ${plan.existing.length} items you have`);
+        if (plan.evidence_only) print(`You have more items than one update can rework, so this run only adds evidence. Merge or discard some items to let it change them.`);
+        put({ type: "start", protocol: PROTOCOL, mode: "update", meetings, moments, existing: plan.existing, new_calls: newCalls, evidence_only: plan.evidence_only });
+      } else {
+        print(`sending ${meetings.length} calls and ${moments.length} moments`);
+        put({ type: "start", protocol: PROTOCOL, mode: "discover", meetings, moments });
+      }
     });
     socket.on("message", (data) => {
       let message;
@@ -76742,11 +77305,17 @@ async function sendRoots(cfRoot, link, print, env = {}) {
       finish(() => reject(new Error(refusalOf(response.statusCode ?? 0))));
     });
     socket.on("error", () => finish(() => reject(new Error(`could not reach the CF service at ${new URL(link.url).host}`))));
-    socket.on("close", (code, reason) => finish(() => reject(new Error(`the server closed the connection before finishing (${code}${reason.length ? `: ${String(reason)}` : ""})`))));
+    socket.on("close", (code, reason2) => finish(() => reject(new Error(`the server closed the connection before finishing (${code}${reason2.length ? `: ${String(reason2)}` : ""})`))));
   });
   if (outcome.type === "failed") return { ok: false, message: outcome.message, report: outcome.report };
-  const applied = applyRootsRun(cfRoot, { items: outcome.items, report: outcome.report, held }, env);
-  return { ok: true, applied, report: outcome.report };
+  if ("update" in outcome) {
+    if (plan.mode !== "update") return { ok: false, message: "the CF service answered a discovery run with an update" };
+    const applied2 = applyUpdateRun(cfRoot, { update: outcome.update, report: outcome.report, held: held2, sent: plan.existing.map((item) => item.id), answered: search.answered }, env);
+    return { ok: true, mode: "update", applied: applied2, report: outcome.report, left_out: plan.left_out };
+  }
+  if (plan.mode !== "discover") return { ok: false, message: "the CF service answered an update with a discovery run" };
+  const applied = applyRootsRun(cfRoot, { items: outcome.items, report: outcome.report, held: held2, answered: search.answered }, env);
+  return { ok: true, mode: "discover", applied, report: outcome.report };
 }
 
 // src/node/link.ts
@@ -76824,8 +77393,8 @@ async function rootsCommand(args, io, env) {
   const [root, action, ...rest] = args;
   if (!root) throw new UsageError("Usage: cf roots <cfRoot> [find | list]");
   if (action === "find") {
-    const { held } = heldCalls(root);
-    io.out(`Finding roots across ${held.length} calls.`);
+    const { held: held2 } = heldCalls(root);
+    io.out(`Finding roots across ${held2.length} calls.`);
     const result = await sendRoots(root, serverLink(env.home), (line2) => io.out(line2), coreEnvOf(env));
     if (!result.ok) {
       io.err(`cf: nothing stored: ${result.message}`);
@@ -76981,140 +77550,6 @@ init_env();
 init_lock();
 init_lifecycle();
 init_frontmatter();
-
-// src/core/merge.ts
-init_env();
-init_lifecycle();
-init_match();
-init_schema();
-init_paths();
-init_txn();
-var MAX_ALIASES = 8;
-function retryOnConflict(run) {
-  for (let round2 = 1; ; round2++) {
-    try {
-      return run();
-    } catch (err) {
-      if (!(err instanceof TxnConflictError) || round2 >= 3) throw err;
-    }
-  }
-}
-function mergeInto(cfRoot, ws, keepId, dropId, env, extraEvents) {
-  if (keepId === dropId) throw new CoreError("same_item", "An item cannot be merged into itself.");
-  const keep = ws.require(keepId);
-  const drop = ws.require(dropId);
-  for (const w of [keep, drop]) {
-    if (w.item.status === "retired") throw new CoreError("retired", RETIRED);
-    if (w.item.status === "discarded") {
-      throw new CoreError("tombstone", `${w.id} is discarded. Restore it before merging it into another item.`);
-    }
-  }
-  const k = keep.item;
-  const d = drop.item;
-  const origConfirmedAt = k.confirmed_at;
-  const origConfirmedBy = k.confirmed_by;
-  const seen = /* @__PURE__ */ new Set();
-  const evidence = [];
-  for (const e of [...k.evidence, ...d.evidence]) {
-    const key = evidenceKey(e);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    evidence.push(e);
-  }
-  k.evidence = evidence;
-  const aliases = [...k.aliases];
-  const haveAlias = new Set([k.name, ...aliases].map(normalizeName));
-  for (const a of [...d.aliases, d.name]) {
-    const n = normalizeName(a);
-    if (haveAlias.has(n)) continue;
-    if (plainTextProblem(a, "An alias", 2, 60) !== null) continue;
-    if (aliases.length >= MAX_ALIASES) break;
-    aliases.push(a);
-    haveAlias.add(n);
-  }
-  k.aliases = aliases;
-  k.make_ideas = mergeMakeIdeas(k.make_ideas, d.make_ideas);
-  k.layers = Math.max(k.layers, d.layers);
-  k.kept = k.kept || d.kept;
-  k.origin = "merge";
-  const not = (id) => id !== keepId && id !== dropId;
-  k.links = [.../* @__PURE__ */ new Set([...k.links, ...d.links])].filter(not);
-  k.possible_duplicate_of = [.../* @__PURE__ */ new Set([...k.possible_duplicate_of, ...d.possible_duplicate_of])].filter(not);
-  k.not_same_as = [.../* @__PURE__ */ new Set([...k.not_same_as, ...d.not_same_as])].filter(not);
-  if (keep.body.trim() === "") keep.body = drop.body;
-  ws.refreshDates(keep, true);
-  k.first_seen = [k.first_seen, d.first_seen].sort()[0];
-  k.last_seen = [k.last_seen, d.last_seen].sort().reverse()[0];
-  const vouched = [k, d].filter((i) => i.status === "confirmed" && (i.confirmed_by === "manual" || i.confirmed_by === "person"));
-  if (vouched.length > 0) {
-    k.held = false;
-    k.confirmed_by = vouched.some((i) => i.confirmed_by === "manual") ? "manual" : "person";
-    k.status = "confirmed";
-    const stamps = vouched.map((i) => i.confirmed_at).filter((s) => s !== null).sort();
-    k.confirmed_at = stamps[0] ?? ws.at;
-  } else {
-    k.held = k.held || d.held;
-    k.confirmed_by = null;
-    k.confirmed_at = null;
-    k.status = "in_review";
-  }
-  ws.touch(keep);
-  const transition = ws.settle(keep);
-  if ((k.type === "blind_spot" || d.type === "blind_spot") && k.status === "confirmed") throw new CoreError("provisional", PROVISIONAL);
-  if (k.status === "confirmed" && k.confirmed_by === "threshold" && origConfirmedBy === "threshold" && origConfirmedAt !== null) {
-    k.confirmed_at = origConfirmedAt;
-  }
-  const tx = beginTxn(txnOptions(cfRoot, env, env.actor ?? defaultActor(ws.tree.settings), { purpose: "merge items" }));
-  ws.remove(drop);
-  ws.writeInto(tx);
-  const stub = redirectStubSchema.parse({ schema_version: SCHEMA_VERSION, id: dropId, redirect_to: keepId, merged_at: ws.at, txn_id: tx.id });
-  tx.write(redirectRelPath(dropId), `${JSON.stringify(stub, null, 2)}
-`, { base: null });
-  for (const r of ws.tree.redirects) {
-    if (r.redirect_to !== dropId) continue;
-    const rel = redirectRelPath(r.id);
-    const file3 = readWithHash(cfRoot, rel);
-    if (!file3) continue;
-    tx.write(rel, `${JSON.stringify({ ...JSON.parse(file3.text), redirect_to: keepId }, null, 2)}
-`, { base: file3.sha256 });
-  }
-  const meetings = countMeetings(k.evidence);
-  const events = [
-    { kind: "items_merged", itemId: keepId, detail: { dropped: dropId, meetings, status: k.status, held: k.held, kept: k.kept } },
-    ...extraEvents
-  ];
-  if (transition) events.push(...transitionEvents([transition], null, CORE_ACTOR));
-  for (const ev of events) tx.event(ev);
-  const res = tx.commit();
-  return { keepId, droppedId: dropId, status: k.status, held: k.held, confirmedBy: k.confirmed_by, meetings, txnId: res.id };
-}
-function resolveDuplicate(cfRoot, input3, answer, env = {}) {
-  if (answer !== "yes" && answer !== "no") throw new CoreError("bad_answer", 'The answer must be "yes" or "no".');
-  return retryOnConflict(() => resolveDuplicateOnce(cfRoot, input3, answer, env));
-}
-function resolveDuplicateOnce(cfRoot, input3, answer, env) {
-  const ws = openWorkspace(cfRoot, env);
-  const a = ws.require(input3.itemId);
-  const b = ws.require(input3.sameAs);
-  if (answer === "yes") {
-    const keepId = input3.keepId ?? input3.sameAs;
-    if (keepId !== input3.itemId && keepId !== input3.sameAs) throw new CoreError("bad_keep", "keepId must be one of the two items.");
-    const dropId = keepId === input3.itemId ? input3.sameAs : input3.itemId;
-    const merged = mergeInto(cfRoot, ws, keepId, dropId, env, []);
-    return { answer, merged, txnId: merged.txnId };
-  }
-  for (const [x, y] of [[a, b], [b, a]]) {
-    x.item.not_same_as = [.../* @__PURE__ */ new Set([...x.item.not_same_as, y.id])];
-    x.item.possible_duplicate_of = x.item.possible_duplicate_of.filter((id) => id !== y.id);
-    ws.touch(x);
-  }
-  const tx = beginTxn(txnOptions(cfRoot, env, env.actor ?? defaultActor(ws.tree.settings), { purpose: "same-as answer" }));
-  ws.writeInto(tx);
-  tx.event({ kind: "same_as_decided", itemId: a.id, detail: { other: b.id, answer: "no" } });
-  return { answer, merged: null, txnId: tx.commit().id };
-}
-
-// src/server/app.ts
 init_pending();
 init_profile();
 init_reader();
@@ -77681,11 +78116,11 @@ function claudeInterviewAgent(opts = {}) {
   });
 }
 function firstJson(text3) {
-  const start = text3.indexOf("{");
+  const start2 = text3.indexOf("{");
   const end = text3.lastIndexOf("}");
-  if (start < 0 || end <= start) return null;
+  if (start2 < 0 || end <= start2) return null;
   try {
-    const v = JSON.parse(text3.slice(start, end + 1));
+    const v = JSON.parse(text3.slice(start2, end + 1));
     return v && typeof v === "object" && !Array.isArray(v) ? v : null;
   } catch {
     return null;
@@ -77741,9 +78176,9 @@ function draftRules(pluginRoots) {
     const file3 = join21(root, "skills", "cf-starting-point", "SKILL.md");
     if (!existsSync14(file3)) continue;
     const text3 = readFileSync20(file3, "utf8");
-    const start = text3.indexOf("## What You Write");
+    const start2 = text3.indexOf("## What You Write");
     const end = text3.indexOf("To save it, use the first path that works.");
-    if (start >= 0 && end > start) return text3.slice(start, end).replace(/You write the draft to a temporary file, then hand it on[^\n]*\n/, "");
+    if (start2 >= 0 && end > start2) return text3.slice(start2, end).replace(/You write the draft to a temporary file, then hand it on[^\n]*\n/, "");
   }
   throw new Error("The interview skill file was not found, so the draft format is unknown.");
 }
@@ -78079,12 +78514,12 @@ function runFence(cfRoot, snap, opts) {
       failed.push(INDEX_REL);
     }
   }
-  let reason = null;
+  let reason2 = null;
   if (reverted.length + failed.length > 0 || indexTampered) {
-    reason = fenceReason([...reverted, ...failed, ...indexTampered ? [INDEX_REL] : []]);
-    if (failed.length > 0) reason += `. ${failed.length} change${failed.length === 1 ? "" : "s"} could not be undone (${failed.join(", ")}). Run cf doctor`;
+    reason2 = fenceReason([...reverted, ...failed, ...indexTampered ? [INDEX_REL] : []]);
+    if (failed.length > 0) reason2 += `. ${failed.length} change${failed.length === 1 ? "" : "s"} could not be undone (${failed.join(", ")}). Run cf doctor`;
   }
-  return { legitimate, reverted, failed, indexRebuilt, reason };
+  return { legitimate, reverted, failed, indexRebuilt, reason: reason2 };
 }
 function resolveLinkPath(root, rel) {
   return join23(root, ...rel.split("/"));
@@ -78112,18 +78547,18 @@ function beginAttempt(ctx, job, carried) {
 function prepareRun(ctx, job, carried, makeHandler2) {
   if (job.kind !== "make") {
     const b2 = beginAttempt(ctx, job, carried);
-    const reason = "Calls are no longer read on this computer; your roots are found through the CF service.";
-    updateAttempt2(ctx.cfRoot, b2.attemptId, { state: "failed", reason, ended_at: at(ctx.env) }, ctx.env);
+    const reason2 = "Calls are no longer read on this computer; your roots are found through the CF service.";
+    updateAttempt2(ctx.cfRoot, b2.attemptId, { state: "failed", reason: reason2, ended_at: at(ctx.env) }, ctx.env);
     revokeAttempt2(ctx.cfRoot, b2.attemptId, {}, ctx.env);
-    return { kind: "failed", attemptId: b2.attemptId, reason };
+    return { kind: "failed", attemptId: b2.attemptId, reason: reason2 };
   }
   const b = beginAttempt(ctx, job, carried);
   const attempt = readCfTree(ctx.cfRoot).attempts.find((a) => a.id === b.attemptId);
   if (!makeHandler2) {
-    const reason = "make jobs are not set up yet";
-    updateAttempt2(ctx.cfRoot, b.attemptId, { state: "failed", reason, ended_at: at(ctx.env) }, ctx.env);
+    const reason2 = "make jobs are not set up yet";
+    updateAttempt2(ctx.cfRoot, b.attemptId, { state: "failed", reason: reason2, ended_at: at(ctx.env) }, ctx.env);
     revokeAttempt2(ctx.cfRoot, b.attemptId, {}, ctx.env);
-    return { kind: "failed", attemptId: b.attemptId, reason };
+    return { kind: "failed", attemptId: b.attemptId, reason: reason2 };
   }
   return armRun(ctx, b, makeHandler2(job, attempt, ctx));
 }
@@ -78148,24 +78583,24 @@ function finishRun(ctx, jobId, prepared, exit, interrupted = false) {
     return { state: "cancelled", reason: attempt.reason, fence: fence2 };
   }
   let state = "done";
-  let reason = null;
+  let reason2 = null;
   const missing = run.verify(tree, attempt);
   if (fence2.reason !== null) {
     state = "failed";
-    reason = fence2.reason;
+    reason2 = fence2.reason;
   } else if (missing !== null) {
     state = "failed";
     const note = exitNote(exit);
-    reason = interrupted ? "interrupted" : note ? `${missing} (${note})` : missing;
+    reason2 = interrupted ? "interrupted" : note ? `${missing} (${note})` : missing;
   } else if (run.finalize) {
     try {
       run.finalize();
     } catch (err) {
       state = "failed";
-      reason = err instanceof Error && err.message !== "" ? err.message : "the result could not be saved";
+      reason2 = err instanceof Error && err.message !== "" ? err.message : "the result could not be saved";
     }
   }
-  updateAttempt2(ctx.cfRoot, attemptId, { state, ended_at: at(ctx.env), exit_code: exit.code ?? null, reason, progress: state === "done" ? "Done." : `Failed: ${reason}${exit.tail.trim() ? `. Last output: ${exit.tail.trim().slice(-300)}` : ""}` }, ctx.env);
+  updateAttempt2(ctx.cfRoot, attemptId, { state, ended_at: at(ctx.env), exit_code: exit.code ?? null, reason: reason2, progress: state === "done" ? "Done." : `Failed: ${reason2}${exit.tail.trim() ? `. Last output: ${exit.tail.trim().slice(-300)}` : ""}` }, ctx.env);
   revokeAttempt2(ctx.cfRoot, attemptId, {}, ctx.env);
   if (state === "done") {
     try {
@@ -78174,7 +78609,7 @@ function finishRun(ctx, jobId, prepared, exit, interrupted = false) {
     }
     removeWorkDir(ctx.cfRoot, jobId);
   }
-  return { state, reason, fence: fence2 };
+  return { state, reason: reason2, fence: fence2 };
 }
 function removeWorkDir(cfRoot, jobId) {
   try {
@@ -78182,8 +78617,8 @@ function removeWorkDir(cfRoot, jobId) {
   } catch {
   }
 }
-function endAttempt(ctx, attemptId, reason, state) {
-  revokeAttempt2(ctx.cfRoot, attemptId, { reason, state }, ctx.env);
+function endAttempt(ctx, attemptId, reason2, state) {
+  revokeAttempt2(ctx.cfRoot, attemptId, { reason: reason2, state }, ctx.env);
 }
 function cancelWithoutProcess(ctx, job) {
   let attemptId = job.current_attempt_id;
@@ -78218,11 +78653,11 @@ function recoverInterrupted(ctx, sys) {
     if (attempt.state !== "running" || attempt.issued_by !== "server") continue;
     const stopped = stopLeftoverWorker(attempt.worker, sys ? { sys } : {});
     const note = stopped === "stopped" ? " Its leftover agent process was stopped." : stopped === "stuck" ? " Its leftover agent process could not be stopped." : stopped === "unknown" ? " The app could not tell whether its agent process is still running." : "";
-    const reason = stopped === "stuck" ? STILL_STOPPING : stopped === "unknown" ? UNKNOWN_STOPPING : "interrupted";
+    const reason2 = stopped === "stuck" ? STILL_STOPPING : stopped === "unknown" ? UNKNOWN_STOPPING : "interrupted";
     updateAttempt2(
       ctx.cfRoot,
       attempt.id,
-      { state: "failed", reason, ended_at: at(ctx.env), progress: `The server stopped while this was running.${note}` },
+      { state: "failed", reason: reason2, ended_at: at(ctx.env), progress: `The server stopped while this was running.${note}` },
       ctx.env
     );
     revokeAttempt2(ctx.cfRoot, attempt.id, {}, ctx.env);
@@ -78249,16 +78684,16 @@ function planMake(cfRoot, itemId3, body) {
   const tree = readCfTree(cfRoot);
   const found = resolveItem(tree, assertItemId(itemId3));
   if (!found) refuse3("no_such_item", `There is no item ${itemId3}.`);
-  const start = found.item;
+  const start2 = found.item;
   if (body["include_unconfirmed"] === true) refuse3("not_confirmed", "Drafts are built from Confirmed items only. Nothing was started.");
-  if (start.location !== "confirmed") refuse3("not_confirmed", `${start.item.name} is still in review. Make is available once it is confirmed.`);
+  if (start2.location !== "confirmed") refuse3("not_confirmed", `${start2.item.name} is still in review. Make is available once it is confirmed.`);
   let idea;
   const idx = body["idea_index"];
   if (idx !== void 0 && idx !== null) {
-    if (typeof idx !== "number" || !Number.isInteger(idx) || idx < 0 || idx >= start.item.make_ideas.length) {
+    if (typeof idx !== "number" || !Number.isInteger(idx) || idx < 0 || idx >= start2.item.make_ideas.length) {
       refuse3("bad_idea", "That make idea is not on this item.");
     }
-    const chosen = start.item.make_ideas[idx];
+    const chosen = start2.item.make_ideas[idx];
     const kind2 = body["kind"] === void 0 || body["kind"] === null ? chosen.kind : body["kind"];
     if (!isMakeKind(kind2)) refuse3("bad_kind", "The output kind must be post, email, or framework_card.");
     idea = { kind: kind2, text: chosen.text };
@@ -78271,7 +78706,7 @@ function planMake(cfRoot, itemId3, body) {
   }
   const extra = body["also_item_ids"];
   if (extra !== void 0 && extra !== null && (!Array.isArray(extra) || extra.some((x) => typeof x !== "string"))) refuse3("bad_items", "also_item_ids must be a list of item ids.");
-  const itemIds = [start.id];
+  const itemIds = [start2.id];
   for (const raw of extra ?? []) {
     const other = resolveItem(tree, assertItemId(raw));
     if (!other) refuse3("no_such_item", `There is no item ${raw}.`);
@@ -78781,8 +79216,8 @@ var JobRunner = class {
       const current = tree.jobs.find((j) => j.id === job.id);
       const attempt = current?.current_attempt_id ? tree.attempts.find((a) => a.id === current.current_attempt_id) : void 0;
       if (attempt && (attempt.state === "running" || attempt.state === "queued")) {
-        const reason = err instanceof CoreError ? err.message : "the job could not be run";
-        endAttempt(this.ctx, attempt.id, reason, "failed");
+        const reason2 = err instanceof CoreError ? err.message : "the job could not be run";
+        endAttempt(this.ctx, attempt.id, reason2, "failed");
       }
     } catch (inner) {
       this.opts.onError?.(inner);
@@ -78863,7 +79298,7 @@ function quoteHolds(ws, e) {
 function startOver(cfRoot, env = {}) {
   const ws = openWorkspace(cfRoot, env);
   const used = new Set(ws.tree.assets.flatMap((asset) => asset.source_items));
-  const targets = ws.active().filter((w) => w.item.origin === "roots" && !(w.item.kept || w.item.held || w.item.confirmed_by === "person" || used.has(w.id)));
+  const targets = ws.active().filter((w) => w.item.origin === "roots" && !protectedItem(w.item, used));
   if (!targets.length) return { retired: [], txnId: null };
   for (const w of targets) {
     w.item.status = "retired";
@@ -79003,9 +79438,19 @@ var RootsRunner = class {
     const chosen = new Set(selectedIds(tree.nodeSelection));
     const calls = [...tree.calls].sort((a, b) => b.meta.date.localeCompare(a.meta.date) || a.callId.localeCompare(b.callId)).map((call) => ({ call_id: call.callId, title: call.meta.title, date: call.meta.date, chosen: chosen.has(call.callId), ready: isPrepared(call, states.get(call.callId)), diarized: call.meta.diarized }));
     const run = tree.rootsRuns.at(-1);
+    const nameOf2 = new Map(tree.items.map((i) => [i.id, i.item.name]));
+    const named = (ids) => ids.map((id) => nameOf2.get(id) ?? id);
+    const after = (service) => {
+      const op = service;
+      return op.op === "split" ? (op.into ?? []).map((part) => part.name) : [op.item?.name ?? ""];
+    };
     const latest = run ? {
       id: run.id,
       at: run.at,
+      mode: run.mode ?? "discover",
+      grown: (run.update?.evidence ?? []).filter((e) => e.added > 0).length,
+      changes: (run.update?.ops ?? []).map((o) => ({ n: o.n, op: o.op, names: named(o.ids), after: after(o.service), reason: o.reason, result: o.result, why: o.why })),
+      weakening: (run.update?.weakening ?? []).map((id) => ({ item_id: id, name: nameOf2.get(id) ?? id })),
       items: run.items.map((r) => {
         const kept = r.opportunities.filter((o) => o.rejected === null);
         const count = (state) => kept.filter((o) => o.state === state).length;
@@ -79025,7 +79470,11 @@ var RootsRunner = class {
         earlier.push({ run_id: r.id, id: entry.id, kind: entry.kind, item_id: entry.item_id, name: entry.name, to_person: entry.to_person, at: r.at, retired: where === "retired" });
       }
     }
-    return { calls, running: this.running, lines: [...this.lines], error: this.error, linked: this.linked(), latest, earlier };
+    const suggestions = tree.rootsRuns.flatMap((r) => (r.update?.suggestions ?? []).filter((s) => s.state === "open").flatMap((s) => {
+      const o = r.update.ops.find((op) => op.n === s.n);
+      return o ? [{ run_id: r.id, n: s.n, op: o.op, names: named(o.ids), after: after(o.service), reason: o.reason }] : [];
+    }));
+    return { calls, running: this.running, lines: [...this.lines], error: this.error, linked: this.linked(), latest, earlier, suggestions };
   }
   startOver() {
     if (this.running) throw busy();
@@ -79045,6 +79494,12 @@ var RootsRunner = class {
     const itemId3 = tree.rootsRuns.find((r) => r.id === runId)?.items.find((e) => e.id === serviceId)?.item_id;
     const retired = itemId3 !== void 0 && itemId3 !== null && tree.items.some((i) => i.id === itemId3 && i.location === "retired");
     const result = retired ? restoreRetired(this.cfRoot, itemId3, this.env) : restoreFromRun(this.cfRoot, runId, serviceId, this.env);
+    this.onChange();
+    return result;
+  }
+  decide(runId, n, accept) {
+    if (this.running) throw busy();
+    const result = decideSuggestion(this.cfRoot, runId, n, accept, this.env);
     this.onChange();
     return result;
   }
@@ -79078,6 +79533,10 @@ var RootsRunner = class {
   }
   async run(link) {
     try {
+      if (heldCalls(this.cfRoot).waiting.length && !await (this.deps.signedIn ?? claudeSignedIn)()) {
+        this.error = `Nothing was sent: ${SIGN_IN}.`;
+        return;
+      }
       const reports = await prepareCalls(this.cfRoot, this.deps.model ?? claudeModel(), {
         modelName: DEFAULT_MODEL,
         env: this.env,
@@ -79093,8 +79552,15 @@ var RootsRunner = class {
         this.error = `Nothing was stored: ${result.message}.`;
         return;
       }
-      const a = result.applied;
-      this.say(`Done: ${a.created.length} new and ${a.joined.length} grown, ${a.skipped.length} set aside, ${a.rejected.length} quotes did not hold up.`);
+      if (result.mode === "discover") {
+        const a = result.applied;
+        this.say(`Done: ${a.created.length} new and ${a.joined.length} grown, ${a.skipped.length} set aside, ${a.rejected.length} quotes did not hold up.`);
+      } else {
+        const a = result.applied;
+        const grown = a.grown.filter((g) => g.added > 0).length;
+        this.say(`Done: ${grown} of your items grew, ${a.applied} changed, ${a.created.length} new, ${a.suggested} suggested for you to review, ${a.rejected.length} quotes did not hold up.`);
+        if (result.left_out) this.say(`${result.left_out} items were left out of this update. Merge or discard some so the next run can rework them all.`);
+      }
     } catch (err) {
       this.error = `Nothing was stored: ${err instanceof Error ? err.message : String(err)}.`;
     }
@@ -81416,6 +81882,13 @@ async function startServer(opts) {
     }
     if (a === "roots" && b === "restore" && segs.length === 2) {
       const result = roots.restore(assertId("rr", str(body, "run_id"), "run id"), str(body, "id"));
+      return ok2({ ok: true, result, roots: roots.view() });
+    }
+    if (a === "roots" && b === "suggestion" && segs.length === 2) {
+      const n = body.n;
+      if (!Number.isInteger(n) || n < 0) throw new HttpError(400, "invalid", '"n" is required and must be a whole number.');
+      if (typeof body.accept !== "boolean") throw new HttpError(400, "invalid", '"accept" is required and must be true or false.');
+      const result = roots.decide(assertId("rr", str(body, "run_id"), "run id"), n, body.accept);
       return ok2({ ok: true, result, roots: roots.view() });
     }
     if (a === "roots" && b === "find" && segs.length === 2) {

@@ -7,8 +7,8 @@ This is the play version: an early build for Lab members to try and report on. E
 ## What You Need First
 
 1. Node 22 or newer. Check with `node --version` in Terminal. If it says v22 or higher, you are set. If not, install the current LTS from nodejs.org.
-2. Claude Code, signed in. Check with `claude --version`, then open `claude` once and sign in if it asks.
-3. Your CF folder is `Documents/CF`, made for you on first use. With iCloud Drive turned on for Documents, it also gets a synced copy. The folder stays on your computer; only the calls you choose are sent to the CF service, one run at a time.
+2. Claude Code in Terminal, signed in. Run `claude auth login` in Terminal. Do this even if you use the Claude desktop app: it signs in separately, and the dashboard uses Terminal's Claude Code to read your calls. `claude auth status` says `"loggedIn": true` when it worked.
+3. Your CF folder is `Documents/CF`, made for you on first use. With iCloud Drive turned on for Documents, it also gets a synced copy. The folder stays on your computer. When you press Find Your Roots, the CF service reads parts of the calls you chose, including what others said around your moments, during that run only, and stores none of them.
 
 ## Install (Two Commands and One Setting)
 
@@ -20,6 +20,27 @@ claude plugin install cflab@cognitive-fingerprint
 ```
 
 `#release` means you get the versions Max has tested, and only those. With auto-update on (step 3), each new one reaches you at the next Claude Code start. Your CF folder is Documents/CF in your home folder. To keep it somewhere else, add ` --config cf_folder=<full path>` to the second command.
+
+### Moving Over From cf-lab
+
+If you used the earlier cf-lab plugin, remove it first: both are called cflab, and having both makes their skills collide. Your CF folder is not touched.
+
+1. Find your current CF folder: `claude plugin configure cflab@cf-lab` shows it.
+2. Remove the old one:
+
+```
+claude plugin uninstall cflab@cf-lab
+claude plugin marketplace remove cf-lab
+```
+
+3. Install the new one with your folder, so you keep your fingerprint instead of starting an empty one in Documents/CF:
+
+```
+claude plugin marketplace add Fun-Stuff-Shared/cf-plugin#release
+claude plugin install cflab@cognitive-fingerprint --config cf_folder=<the full path from step 1>
+```
+
+Then do step 3 below.
 
 ### Step 3: Turn On Auto-Update (Do Not Skip)
 
@@ -52,7 +73,7 @@ Your browser opens on your dashboard, signed in. That is all you ever need to do
 - **Every time.** Say it whenever you want the dashboard, including after you restart your computer.
 - **If a page says "Open Your CF Dashboard",** your sign-in has run out. Say the same sentence to Claude Code again.
 - **If your browser says it cannot connect,** the dashboard is not running. Say the same sentence to Claude Code. It starts the dashboard and opens it.
-- **Your calls stay on your computer.** The dashboard only answers on your own machine. When you press Find Your Roots, only the calls you chose are sent to the CF service for that one run, and the service keeps nothing.
+- **Your calls stay on your computer.** The dashboard only answers on your own machine. When you press Find Your Roots, the CF service reads only the parts of your chosen calls it asks for, including what others said around your moments, for that one run, and stores none of them.
 
 ## Keep Your Dashboard Ready
 
