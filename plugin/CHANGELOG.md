@@ -2,6 +2,12 @@
 
 Every release has a new version in `plugin/.claude-plugin/plugin.json`. Claude Code ignores new commits under an unchanged version, so a change with no bump never reaches anyone. The Build line under each heading is written by `npm run build:plugin`.
 
+## 0.10.1 - 2026-10-08
+
+Build: dist sha256 97d4d8b793ddf649502b5877f3c52a05f9ce02158f4e1ee28e1662412c0ffc01; skills sha256 206d0c6c0519aea2758ca56f3d69836b66eeec74eac555f4eeb23f6d936cfd94
+
+If your dashboard is started twice at the same moment, for example when your Mac starts it at login while you ask Claude to open it, only one dashboard starts and you are taken to it. If a dashboard ever finds that another one has taken its CF folder, it stops within a few seconds and says why, so two never run on one folder.
+
 ## 0.10.0 - 2026-10-08
 
 Build: dist sha256 65e02250a7dc98c39001df8e12da11c86b468e8946e8bb20efc8df9957bcd396; skills sha256 206d0c6c0519aea2758ca56f3d69836b66eeec74eac555f4eeb23f6d936cfd94

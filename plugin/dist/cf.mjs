@@ -9944,9 +9944,9 @@ function parseURLObject(trimmed, def) {
 function stripTabAndNewline(value) {
   return value.replace(asciiTabOrNewline, "");
 }
-function urlHostnameOk(url3, hostname6) {
-  hostname6.lastIndex = 0;
-  return hostname6.test(url3.hostname);
+function urlHostnameOk(url3, hostname7) {
+  hostname7.lastIndex = 0;
+  return hostname7.test(url3.hostname);
 }
 function urlProtocolOk(url3, protocol) {
   protocol.lastIndex = 0;
@@ -30303,9 +30303,9 @@ function parseURLObject2(trimmed, def) {
 function stripTabAndNewline2(value) {
   return value.replace(asciiTabOrNewline2, "");
 }
-function urlHostnameOk2(url3, hostname6) {
-  hostname6.lastIndex = 0;
-  return hostname6.test(url3.hostname);
+function urlHostnameOk2(url3, hostname7) {
+  hostname7.lastIndex = 0;
+  return hostname7.test(url3.hostname);
 }
 function urlProtocolOk2(url3, protocol) {
   protocol.lastIndex = 0;
@@ -54252,7 +54252,7 @@ var require_websocket = __commonJS({
     var http = __require("http");
     var net = __require("net");
     var tls = __require("tls");
-    var { randomBytes: randomBytes10, createHash: createHash5 } = __require("crypto");
+    var { randomBytes: randomBytes11, createHash: createHash5 } = __require("crypto");
     var { Duplex, Readable: Readable2 } = __require("stream");
     var { URL: URL2 } = __require("url");
     var PerMessageDeflate2 = require_permessage_deflate();
@@ -54790,7 +54790,7 @@ var require_websocket = __commonJS({
         }
       }
       const defaultPort = isSecure ? 443 : 80;
-      const key = randomBytes10(16).toString("base64");
+      const key = randomBytes11(16).toString("base64");
       const request = isSecure ? https.request : http.request;
       const protocolSet = /* @__PURE__ */ new Set();
       let perMessageDeflate;
@@ -57401,13 +57401,13 @@ var init_views = __esm({
 });
 
 // src/core/attempts.ts
-import { randomBytes as randomBytes8, timingSafeEqual as timingSafeEqual2 } from "node:crypto";
+import { randomBytes as randomBytes9, timingSafeEqual as timingSafeEqual2 } from "node:crypto";
 function hashToken(token) {
   return sha256(token);
 }
 function makeToken() {
   for (; ; ) {
-    const token = randomBytes8(32).toString("base64url");
+    const token = randomBytes9(32).toString("base64url");
     if (!token.startsWith("-")) return token;
   }
 }
@@ -74284,6 +74284,7 @@ var JOB_ENV_REMOVED = ["ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN"];
 function spawnAgent(spec, opts) {
   const env = { ...process.env, ...opts.env, CF_COMMIT_TOKEN: opts.token };
   for (const name of JOB_ENV_REMOVED) delete env[name];
+  if (process.versions.electron) env.ELECTRON_RUN_AS_NODE = "1";
   const nonce = randomBytes5(12).toString("hex");
   const gated = opts.gated === true;
   let child;
@@ -77319,17 +77320,30 @@ async function sendRoots(cfRoot, link, print, env = {}) {
 }
 
 // src/node/link.ts
-init_src();
-init_env();
 import { chmodSync, existsSync as existsSync10, mkdirSync as mkdirSync7, readFileSync as readFileSync14, renameSync as renameSync5, writeFileSync as writeFileSync4 } from "node:fs";
 import { homedir as homedir4 } from "node:os";
 import { dirname as dirname7, join as join15 } from "node:path";
+
+// src/node/service.ts
+init_src();
 var SERVICE_URL = "wss://api.cognitivefingerprint.ai";
 var KEY_PATTERN = /^cfk_[A-Za-z0-9_-]{43}$/;
-var linkPath = (home = homedir4()) => join15(home, "Library", "Application Support", "CF Dashboard", "server.json");
 function serviceUrl(env = process.env) {
   return `${(env.CF_SERVICE_URL?.trim() || SERVICE_URL).replace(/\/+$/, "")}${ROOTS_PATH}`;
 }
+var checkKey = async (url3, key) => {
+  try {
+    const response = await fetch(url3.replace(/^ws/, "http"), { headers: { Authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(15e3) });
+    if (response.status === 426) return "accepted";
+    return response.status === 401 ? "refused" : "unreachable";
+  } catch {
+    return "unreachable";
+  }
+};
+
+// src/node/link.ts
+init_env();
+var linkPath = (home = homedir4()) => join15(home, "Library", "Application Support", "CF Dashboard", "server.json");
 function serverLink(home, env = process.env) {
   const path = linkPath(home);
   if (existsSync10(path)) {
@@ -77346,15 +77360,6 @@ function saveKey(key, home) {
   chmodSync(`${path}.tmp`, 384);
   renameSync5(`${path}.tmp`, path);
 }
-var checkKey = async (url3, key) => {
-  try {
-    const response = await fetch(url3.replace(/^ws/, "http"), { headers: { Authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(15e3) });
-    if (response.status === 426) return "accepted";
-    return response.status === 401 ? "refused" : "unreachable";
-  } catch {
-    return "unreachable";
-  }
-};
 
 // src/cli/roots.ts
 function callsCommand(args, io, env) {
@@ -77400,6 +77405,11 @@ async function rootsCommand(args, io, env) {
       io.err(`cf: nothing stored: ${result.message}`);
       return 1;
     }
+    if (result.mode === "update") {
+      const a2 = result.applied;
+      io.out(`Updated: ${a2.grown.filter((g) => g.added > 0).length} items grew, ${a2.applied} changed, ${a2.created.length} new, ${a2.suggested} suggested, ${a2.unapplied.length} not applied, ${a2.weakening.length} weakening; ${a2.rejected.length} quotes did not hold up.`);
+      return 0;
+    }
     const a = result.applied;
     io.out(`Stored ${a.created.length} new items, grew ${a.joined.length}, set aside ${a.skipped.length}; ${a.rejected.length} quotes did not hold up.`);
     return 0;
@@ -77423,8 +77433,9 @@ init_zod();
 init_build_info();
 init_avatar();
 import { closeSync as closeSync5, existsSync as existsSync18, lstatSync as lstatSync13, openSync as openSync5, readFileSync as readFileSync26, readSync as readSync3, realpathSync as realpathSync4 } from "node:fs";
-import { randomBytes as randomBytes9 } from "node:crypto";
+import { randomBytes as randomBytes10 } from "node:crypto";
 import { createServer } from "node:http";
+import { hostname as hostname6 } from "node:os";
 import { extname as extname4, join as join27, sep as sep6 } from "node:path";
 
 // src/core/feedback.ts
@@ -77600,7 +77611,8 @@ init_paths();
 init_txn();
 
 // scripts/serve-guard.mjs
-import { existsSync as existsSync12, mkdirSync as mkdirSync9, readFileSync as readFileSync17, unlinkSync as unlinkSync7, writeFileSync as writeFileSync5 } from "node:fs";
+import { randomBytes as randomBytes7 } from "node:crypto";
+import { existsSync as existsSync12, linkSync as linkSync4, readFileSync as readFileSync17, renameSync as renameSync6, unlinkSync as unlinkSync7, writeFileSync as writeFileSync5 } from "node:fs";
 import { join as join18 } from "node:path";
 import { hostname as hostname5 } from "node:os";
 var LOOPBACK_HOST = "127.0.0.1";
@@ -77631,8 +77643,7 @@ function pidAlive(pid) {
     return err && err.code === "EPERM";
   }
 }
-function checkServerLock(cfRoot, { machineId = hostname5(), now = Date.now() } = {}) {
-  const path = serverLockPath(cfRoot);
+function checkServerLock(cfRoot, { machineId = hostname5(), now = Date.now() } = {}, path = serverLockPath(cfRoot)) {
   if (!existsSync12(path)) return { live: false, info: null, reason: "no lock file" };
   let info;
   try {
@@ -77652,60 +77663,112 @@ function checkServerLock(cfRoot, { machineId = hostname5(), now = Date.now() } =
   }
   return { live: false, info, reason: "lock from another machine is stale" };
 }
-function guardServerStart({
+function acquireServerLock({
   cfRoot,
-  port,
   host = LOOPBACK_HOST,
   machineId = hostname5(),
   pid = process.pid,
   now = () => /* @__PURE__ */ new Date()
 }) {
   assertLoopback(host);
-  assertPort(port);
   if (!existsSync12(join18(cfRoot, "workshop"))) {
     throw new Error(`"${cfRoot}" does not look like a CF folder (no workshop/ inside).`);
   }
-  const state = checkServerLock(cfRoot, { machineId, now: now().getTime() });
-  if (state.live) {
-    throw new Error(
-      `A CF server is already running for this folder (${state.reason}). Open its dashboard instead of starting another.`
-    );
-  }
   const path = serverLockPath(cfRoot);
-  const write2 = () => writeFileSync5(
-    path,
-    JSON.stringify(
-      {
-        schema_version: 1,
-        machine_id: machineId,
-        pid,
-        port,
-        host,
-        started_at: startedAt,
-        heartbeat_at: now().toISOString()
-      },
-      null,
-      2
-    ) + "\n"
-  );
+  const token = randomBytes7(16).toString("hex");
   const startedAt = now().toISOString();
-  mkdirSync9(join18(cfRoot, "workshop"), { recursive: true });
-  write2();
-  return {
-    heartbeat: write2,
-    release() {
-      try {
-        const current = JSON.parse(readFileSync17(path, "utf8"));
-        if (current.pid === pid && current.machine_id === machineId) unlinkSync7(path);
-      } catch {
-      }
+  let port = null;
+  let writes = 0;
+  const staged = () => {
+    const tmp = `${path}.tmp-${token}-${writes++}`;
+    const record3 = { schema_version: 1, token, machine_id: machineId, pid, host, port, state: port === null ? "starting" : "ready", started_at: startedAt, heartbeat_at: now().toISOString() };
+    writeFileSync5(tmp, JSON.stringify(record3, null, 2) + "\n", { flag: "wx" });
+    return tmp;
+  };
+  const discard = (tmp) => {
+    try {
+      unlinkSync7(tmp);
+    } catch {
     }
   };
+  const running = (reason2) => new Error(`A CF server is already running for this folder (${reason2}). Open its dashboard instead of starting another.`);
+  const held2 = () => {
+    try {
+      return JSON.parse(readFileSync17(path, "utf8")).token === token;
+    } catch {
+      return false;
+    }
+  };
+  const update = () => {
+    if (!held2()) return false;
+    const tmp = staged();
+    try {
+      renameSync6(tmp, path);
+    } catch (err) {
+      discard(tmp);
+      throw err;
+    }
+    return true;
+  };
+  const claim3 = () => {
+    const tmp = staged();
+    try {
+      linkSync4(tmp, path);
+      return true;
+    } catch (err) {
+      if (err && err.code === "EEXIST") return false;
+      throw err;
+    } finally {
+      discard(tmp);
+    }
+  };
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (claim3()) {
+      return {
+        token,
+        ready(boundPort) {
+          port = assertPort(boundPort);
+          if (!update()) throw new Error("Another CF server took this folder while this one was starting. Open its dashboard instead.");
+        },
+        heartbeat: update,
+        holds: held2,
+        release() {
+          if (!held2()) return;
+          const aside2 = `${path}.released-${token}`;
+          try {
+            renameSync6(path, aside2);
+            unlinkSync7(aside2);
+          } catch {
+          }
+        }
+      };
+    }
+    const state = checkServerLock(cfRoot, { machineId, now: now().getTime() });
+    if (state.live) throw running(state.reason);
+    const aside = `${path}.stale-${token}-${attempt}`;
+    try {
+      renameSync6(path, aside);
+    } catch (err) {
+      if (err && err.code === "ENOENT") continue;
+      throw err;
+    }
+    const moved = checkServerLock(cfRoot, { machineId, now: now().getTime() }, aside);
+    if (moved.live) {
+      try {
+        linkSync4(aside, path);
+      } catch {
+      }
+      unlinkSync7(aside);
+      throw running(moved.reason);
+    }
+    unlinkSync7(aside);
+  }
+  throw new Error("Another CF server is starting for this folder. Try again in a moment.");
 }
 
 // src/server/auth.ts
-import { createHash as createHash4, randomBytes as randomBytes7, timingSafeEqual } from "node:crypto";
-import { existsSync as existsSync13, mkdirSync as mkdirSync10, readFileSync as readFileSync18, renameSync as renameSync6, statSync as statSync5, unlinkSync as unlinkSync8, writeFileSync as writeFileSync6 } from "node:fs";
+import { createHash as createHash4, randomBytes as randomBytes8, timingSafeEqual } from "node:crypto";
+import { existsSync as existsSync13, mkdirSync as mkdirSync9, readFileSync as readFileSync18, renameSync as renameSync7, statSync as statSync5, unlinkSync as unlinkSync8, writeFileSync as writeFileSync6 } from "node:fs";
 import { homedir as homedir5 } from "node:os";
 import { dirname as dirname9, join as join19 } from "node:path";
 var NONCE_TTL_MS = 6e4;
@@ -77725,10 +77788,10 @@ function safeEqualHex(a, b) {
   return x.length === y.length && x.length > 0 && timingSafeEqual(x, y);
 }
 function writePrivate(path, text3) {
-  mkdirSync10(dirname9(path), { recursive: true, mode: 448 });
-  const tmp = `${path}.${process.pid}.${randomBytes7(3).toString("hex")}.tmp`;
+  mkdirSync9(dirname9(path), { recursive: true, mode: 448 });
+  const tmp = `${path}.${process.pid}.${randomBytes8(3).toString("hex")}.tmp`;
   writeFileSync6(tmp, text3, { mode: 384 });
-  renameSync6(tmp, path);
+  renameSync7(tmp, path);
 }
 var NonceStore = class {
   path;
@@ -77739,7 +77802,7 @@ var NonceStore = class {
   }
   /** Makes a new nonce. Any earlier nonce for this folder stops working. */
   mint() {
-    const nonce = randomBytes7(24).toString("base64url");
+    const nonce = randomBytes8(24).toString("base64url");
     const expiresAt = this.clock() + NONCE_TTL_MS;
     writePrivate(this.path, `${JSON.stringify({ hash: hashOf(nonce), expires_at: expiresAt })}
 `);
@@ -77798,7 +77861,7 @@ var SessionStore = class {
 `);
   }
   create() {
-    const token = randomBytes7(32).toString("base64url");
+    const token = randomBytes8(32).toString("base64url");
     this.prune();
     this.sessions = [...this.sessions, { hash: hashOf(token), expires_at: this.clock() + SESSION_MAX_AGE_S * 1e3 }].slice(-MAX_SESSIONS);
     this.save();
@@ -79413,7 +79476,8 @@ var RootsRunner = class {
   lines = [];
   error = null;
   link() {
-    return this.deps.link ? this.deps.link() : serverLink(this.env.home);
+    if (!this.deps.link) throw new CoreError("no_server", "This computer is not connected to the CF service yet.");
+    return this.deps.link();
   }
   linked() {
     try {
@@ -79422,15 +79486,6 @@ var RootsRunner = class {
     } catch {
       return false;
     }
-  }
-  async connect(key) {
-    const trimmed = key.trim();
-    if (!KEY_PATTERN.test(trimmed)) throw new CoreError("bad_key", "That does not look like a CF service key. Copy the whole key, starting with cfk_, and paste it again.");
-    const answer = await (this.deps.checkKey ?? checkKey)(serviceUrl(), trimmed);
-    if (answer === "refused") throw new CoreError("key_refused", "The CF service did not accept that key. Check you copied all of it, or ask for a new one.");
-    if (answer === "unreachable") throw new CoreError("service_unreachable", "The CF service could not be reached to check your key. Check your internet connection and try again.");
-    saveKey(trimmed, this.env.home);
-    this.onChange();
   }
   view() {
     const tree = readCfTree(this.cfRoot);
@@ -81359,7 +81414,7 @@ function isIgnoredRelPath(rel) {
   const segments = rel.split("/");
   if (segments.some((s) => s.startsWith("."))) return true;
   if (IGNORED_FILES.has(rel)) return true;
-  if (rel.startsWith("workshop/lock.json.")) return true;
+  if (rel.startsWith("workshop/lock.json.") || rel.startsWith("workshop/server.json.")) return true;
   if (segments[0] === "workshop" && segments.length > 1 && IGNORED_DIRS.has(segments[1])) return true;
   return CONFLICT_COPY.test(segments[segments.length - 1]);
 }
@@ -81421,6 +81476,7 @@ async function startWatcher(opts) {
 var DEFAULT_PORT = 4747;
 var MAX_BODY_BYTES = 64 * 1024;
 var UPLOAD_BODY_BYTES = 12 * 1024 * 1024;
+var LOCK_CHECKS_PER_HEARTBEAT = 15;
 var HttpError = class extends Error {
   constructor(status, code, message) {
     super(message);
@@ -81872,8 +81928,9 @@ async function startServer(opts) {
       roots.choose(ids.map((id) => assertId("c", id, "call id")), body["chosen"]);
       return ok2({ ok: true, roots: roots.view() });
     }
-    if (a === "roots" && b === "key" && segs.length === 2) {
-      await roots.connect(str(body, "key"));
+    if (a === "roots" && b === "key" && segs.length === 2 && opts.acceptKey) {
+      await opts.acceptKey(str(body, "key"));
+      broadcast({ type: "roots" });
       return ok2({ ok: true, roots: roots.view() });
     }
     if (a === "roots" && b === "start-over" && segs.length === 2) {
@@ -81936,7 +81993,7 @@ async function startServer(opts) {
       const n = body["n"];
       if (typeof n !== "number" || !INTERVIEW_QUESTIONS.some((q) => q.n === n)) fail(400, "invalid", "n must be a question number from 1 to 10.");
       const text3 = cleanAnswer(body["text"]);
-      const rev = randomBytes9(8).toString("hex");
+      const rev = randomBytes10(8).toString("hex");
       const group = n <= 9 ? Math.ceil(n / 3) * 3 : null;
       retryOnLock(
         () => updateInterview(cfRoot, env, (iv) => {
@@ -82219,23 +82276,25 @@ async function startServer(opts) {
     const out = await routeApi(method, segs, url3.searchParams, req);
     sendJson(res, out.status, out.body);
   }
-  await new Promise((resolve6, reject) => {
-    server.once("error", reject);
-    server.listen(wantedPort, LOOPBACK_HOST, () => {
-      server.off("error", reject);
-      resolve6();
-    });
-  });
-  boundPort = server.address().port;
-  let guard;
+  const guard = (opts.acquireLock ?? acquireServerLock)({ cfRoot, host: LOOPBACK_HOST });
   try {
-    guard = guardServerStart({ cfRoot, port: boundPort, host: LOOPBACK_HOST });
+    await new Promise((resolve6, reject) => {
+      server.once("error", reject);
+      server.listen(wantedPort, LOOPBACK_HOST, () => {
+        server.off("error", reject);
+        resolve6();
+      });
+    });
+    boundPort = server.address().port;
+    guard.ready(boundPort);
   } catch (err) {
-    server.close();
+    if (server.listening) {
+      server.closeAllConnections();
+      await new Promise((resolve6) => server.close(() => resolve6()));
+    }
+    guard.release();
     throw err;
   }
-  const heartbeat = setInterval(() => guard.heartbeat(), 3e4);
-  heartbeat.unref();
   const ping = setInterval(() => {
     for (const client of sseClients) client.write(": ping\n\n");
   }, 25e3);
@@ -82260,7 +82319,10 @@ async function startServer(opts) {
     });
   }
   let closed = false;
-  return {
+  let heartbeat;
+  let markClosed;
+  const whenClosed = new Promise((resolve6) => markClosed = resolve6);
+  const cfServer = {
     port: boundPort,
     url: `http://${LOOPBACK_HOST}:${boundPort}`,
     cfRoot,
@@ -82284,13 +82346,26 @@ async function startServer(opts) {
         server.closeAllConnections();
       });
       guard.release();
-    }
+      markClosed();
+    },
+    closed: whenClosed
   };
+  let lockChecks = 0;
+  heartbeat = setInterval(() => {
+    const kept = ++lockChecks % LOCK_CHECKS_PER_HEARTBEAT === 0 ? guard.heartbeat() : guard.holds();
+    if (kept || closed) return;
+    opts.onError?.(new Error("Another CF server took this folder's lock, so this dashboard stopped. Open the other one instead."));
+    void cfServer.close();
+  }, opts.lockCheckMs ?? 2e3);
+  heartbeat.unref();
+  return cfServer;
 }
-function runningServer(cfRoot) {
-  const s = checkServerLock(cfRoot);
-  const port = s.info?.port;
-  return s.live && typeof port === "number" ? { port } : null;
+var OPEN_ELSEWHERE = "Your CF dashboard is open on another Mac. Close it there, wait for your folder to sync, then open it here.";
+function runningServer(cfRoot, machineId = hostname6()) {
+  const s = checkServerLock(cfRoot, { machineId });
+  const info = s.info;
+  if (s.live && info?.machine_id !== machineId) throw new CoreError("open_elsewhere", OPEN_ELSEWHERE);
+  return s.live && typeof info?.port === "number" ? { port: info.port } : null;
 }
 
 // src/cli/open.ts
@@ -82361,6 +82436,22 @@ async function runOpen(cfRoot, deps = {}) {
   const url3 = `http://127.0.0.1:${live.port}/auth?n=${nonce}`;
   await (deps.openBrowser ?? defaultOpenBrowser)(url3);
   return { url: url3, port: live.port, startedServer };
+}
+
+// src/server/key-file.ts
+init_env();
+function keyFile({ home, check: check3 = checkKey } = {}) {
+  return {
+    link: () => serverLink(home),
+    async acceptKey(key) {
+      const trimmed = key.trim();
+      if (!KEY_PATTERN.test(trimmed)) throw new CoreError("bad_key", "That does not look like a CF service key. Copy the whole key, starting with cfk_, and paste it again.");
+      const answer = await check3(serviceUrl(), trimmed);
+      if (answer === "refused") throw new CoreError("key_refused", "The CF service did not accept that key. Check you copied all of it, or ask for a new one.");
+      if (answer === "unreachable") throw new CoreError("service_unreachable", "The CF service could not be reached to check your key. Check your internet connection and try again.");
+      saveKey(trimmed, home);
+    }
+  };
 }
 
 // src/cli/cf.ts
@@ -82567,14 +82658,19 @@ async function runCliAsync(argv, io, deps = {}) {
       io.err("Usage: cf serve <cfRoot> [--port N]");
       return 2;
     }
-    const server = await startServer({ cfRoot: root, ...port !== void 0 ? { port } : {}, ...deps.env ? { env: deps.env } : {}, onError: (e) => io.err(`cf: ${e.stack ?? String(e)}`) });
+    const key = keyFile(deps.env?.home !== void 0 ? { home: deps.env.home } : {});
+    const server = await startServer({ cfRoot: root, ...port !== void 0 ? { port } : {}, ...deps.env ? { env: deps.env } : {}, roots: { link: key.link }, acceptKey: key.acceptKey, onError: (e) => io.err(`cf: ${e.stack ?? String(e)}`) });
     io.out(`CF dashboard running at ${server.url} for ${server.cfRoot}`);
     io.out('Run "cf open" to sign in. Press Ctrl+C to stop.');
-    await (deps.serveUntil ?? (() => untilSignal()))(server);
+    await Promise.race([(deps.serveUntil ?? (() => untilSignal()))(server), server.closed]);
     await server.close();
     io.out("Stopped.");
     return 0;
   } catch (err) {
+    if (err instanceof CoreError) {
+      io.err(`cf: ${err.message}`);
+      return 1;
+    }
     if (err instanceof PathRefusedError || err instanceof LockError || err instanceof Error && /^(A CF server is already running|Refusing|"[^"]*" is not a valid port|The dashboard server did not start|listen EADDRINUSE)/.test(err.message)) {
       io.err(`cf: ${err.message}`);
       return 2;

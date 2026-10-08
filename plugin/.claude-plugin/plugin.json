@@ -1,7 +1,7 @@
 {
   "name": "cflab",
   "displayName": "Cognitive Fingerprint",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Your Cognitive Fingerprint as a folder on your computer: a private dashboard, the roots of how you think found by the CF service from the calls you choose, and read-only access for your AI agents.",
   "author": {
     "name": "Max Bernstein"
