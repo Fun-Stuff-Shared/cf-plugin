@@ -2,6 +2,12 @@
 
 Every release has a new version in `plugin/.claude-plugin/plugin.json`. Claude Code ignores new commits under an unchanged version, so a change with no bump never reaches anyone. The Build line under each heading is written by `npm run build:plugin`.
 
+## 0.9.1 - 2026-10-08
+
+Build: dist sha256 6bc2b1007c3de437057c9e8aa4deba8037dbfa73e8cda5f548097f6ffb2709d4; skills sha256 206d0c6c0519aea2758ca56f3d69836b66eeec74eac555f4eeb23f6d936cfd94
+
+A finding's file no longer lists the roots it comes from by name, so a root you have not confirmed yet can never show up in your fingerprint through a confirmed pattern. The dashboard still shows how your findings connect.
+
 ## 0.9.0 - 2026-10-08
 
 Build: dist sha256 86826fe9ba00311fe2f320384de46013fb69ed3926ef6f3e6ae1d1ad035def49; skills sha256 206d0c6c0519aea2758ca56f3d69836b66eeec74eac555f4eeb23f6d936cfd94

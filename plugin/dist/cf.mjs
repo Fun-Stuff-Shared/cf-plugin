@@ -74656,9 +74656,8 @@ function applyRootsRun(cfRoot, input3, env = {}) {
     }
   }
 }
-function kindBody(item, names) {
+function kindBody(item) {
   const layers = layerBody(item.kind === "root" ? { ...item.layer_text, l4: void 0 } : item.layer_text);
-  const expressed = item.kind === "root" ? [] : item.fields.expresses.map((id) => names.get(id)).filter((name) => name !== void 0);
   const section = item.kind === "root" ? `## Hidden Belief
 
 ${item.fields.root}
@@ -74676,12 +74675,7 @@ ${item.fields.cost}
 
 ${item.fields.steps.map((step, i) => `${i + 1}. ${step.text}${step.required ? "" : " (optional)"}`).join("\n")}
 `;
-  const roots = expressed.length ? `
-## Comes From
-
-${expressed.map((name) => `- ${name}`).join("\n")}
-` : "";
-  return [layers.trimEnd(), section + roots].filter(Boolean).join("\n\n");
+  return [layers.trimEnd(), section].filter(Boolean).join("\n\n");
 }
 function checkOpportunity(ws, held, chosen, callId, turn, quote) {
   const problem2 = (text3) => ({ problem: text3 });
@@ -74712,7 +74706,6 @@ function applyOnce(cfRoot, items, report, heldIds, env) {
   const result = { runId, txnId: "", created: [], joined: [], skipped: [], rejected: [] };
   const record3 = [];
   const itemIds = /* @__PURE__ */ new Map();
-  const names = /* @__PURE__ */ new Map();
   const ordered = [...items].sort((a, b) => Number(a.kind !== "root") - Number(b.kind !== "root"));
   for (const item of ordered) {
     const type = TYPE_OF[item.kind];
@@ -74755,17 +74748,14 @@ function applyOnce(cfRoot, items, report, heldIds, env) {
           { type, name: item.name, aliases: item.aliases, mechanism: item.summary, layers: item.layers, dimension: item.kind === "root" ? ROOT_DIMENSION[item.dimension] : item.dimension, ...item.layer_text ? { layer_text: item.layer_text } : {}, to_person: { mechanism: item.to_person } },
           { origin: "roots", evidence, make_ideas: item.make_ideas, links, fields, measure: item.measure, first_seen: dates[0] ?? at2.slice(0, 10), last_seen: dates[dates.length - 1] ?? at2.slice(0, 10) }
         );
-        w.body = kindBody({ ...item, fields }, names);
+        w.body = kindBody({ ...item, fields });
         itemId3 = w.id;
         result.created.push({ id: item.id, item_id: itemId3 });
         events.push({ kind: "item_created", itemId: itemId3, detail: { run_id: runId, service_id: item.id, origin: "roots", type } });
       }
     }
     if (setAside2) result.skipped.push({ id: item.id, reason: setAside2 });
-    if (itemId3) {
-      itemIds.set(item.id, itemId3);
-      names.set(itemId3, ws.get(itemId3).item.name);
-    }
+    if (itemId3) itemIds.set(item.id, itemId3);
     record3.push({ id: item.id, kind: item.kind, item_id: itemId3, set_aside: setAside2, name: item.name, summary: item.summary, to_person: item.to_person, aliases: item.aliases, layers: item.layers, dimension: item.dimension, layer_text: item.layer_text, make_ideas: item.make_ideas, situations: item.situations, confirm_if: item.confirm_if, disconfirm_if: item.disconfirm_if, fields, measure: item.measure, verdict: item.verdict, opportunities });
   }
   const transitions = ws.settleAll();
@@ -78964,8 +78954,7 @@ function restoreFromRun(cfRoot, runId, serviceId, env = {}) {
     make_ideas: service.make_ideas,
     evidence
   };
-  const names = new Map([...ws.works.values()].map((w2) => [w2.id, w2.item.name]));
-  const w = ws.create(item, kindBody(service.kind === "root" ? service : { ...service, fields: { ...service.fields, expresses: links } }, names));
+  const w = ws.create(item, kindBody(service));
   ws.settle(w);
   const dropped = entry.opportunities.filter((o) => o.state === "fired" && o.rejected === null).length - evidence.length;
   const txnId = commitWorkspace(cfRoot, ws, env, "restore from an earlier run", [{ kind: "item_recovered", itemId: itemId3, detail: { run_id: runId, service_id: serviceId, dropped, status: w.item.status } }]);
