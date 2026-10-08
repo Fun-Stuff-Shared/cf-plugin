@@ -1,0 +1,15 @@
+{
+  "name": "cflab",
+  "version": "0.8.0",
+  "date": "2026-10-08",
+  "sha256": "21bae31342378341ed59a68f7db00625fd12cb44cc7e059080530ca6b8996d86",
+  "skills_sha256": "47aa448817c9b460fda14a90efc04449c15f64657747da040366e0f382804d33",
+  "skills": [
+    "cf-expertise",
+    "cf-keep-ready",
+    "cf-make",
+    "cf-onboard",
+    "cf-open",
+    "cf-starting-point"
+  ]
+}

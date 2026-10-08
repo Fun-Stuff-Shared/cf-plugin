@@ -1,0 +1,14 @@
+{
+  "name": "cognitive-fingerprint",
+  "description": "The Cognitive Fingerprint plugin marketplace.",
+  "owner": {
+    "name": "Cognitive Fingerprint"
+  },
+  "plugins": [
+    {
+      "name": "cflab",
+      "source": "./plugin",
+      "description": "Cognitive Fingerprint: your own CF folder, a private dashboard, the deep roots of how you think, and read-only agent access."
+    }
+  ]
+}

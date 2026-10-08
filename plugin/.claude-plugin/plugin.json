@@ -1,0 +1,17 @@
+{
+  "name": "cflab",
+  "displayName": "Cognitive Fingerprint",
+  "version": "0.8.0",
+  "description": "Your Cognitive Fingerprint as a folder on your computer: a private dashboard, the roots of how you think found by the CF service from the calls you choose, and read-only access for your AI agents.",
+  "author": {
+    "name": "Max Bernstein"
+  },
+  "userConfig": {
+    "cf_folder": {
+      "type": "directory",
+      "title": "CF folder",
+      "description": "The folder that holds your Cognitive Fingerprint. Leave it empty to use Documents/CF in your home folder. It stays on this computer.",
+      "required": false
+    }
+  }
+}
