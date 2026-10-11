@@ -38,6 +38,6 @@ If the CF tools are not available in this session, say so in one line ("Your CF 
 ## Writing in Their Voice
 
 1. Call `cf_write_like_me` with the topic.
-2. Follow its `how_to_use` lines. Let `findings` set the stance and `voice_samples` set the cadence. Use `foundation` only to aim the piece; never state a goal or a measure as a promise.
+2. Follow its `how_to_use` lines. Start from the request. Let the `findings` whose situation is in the request set the stance, and `voice_samples` set the cadence. No findings means none fit: write from the request in their voice. Use `foundation` only to aim the piece; never state a goal or a measure as a promise.
 3. Draft in plain words, first person, short sentences. No em dashes. No hype.
 4. End with one line naming the findings you used, by name.

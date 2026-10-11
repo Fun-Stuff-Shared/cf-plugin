@@ -2,6 +2,16 @@
 
 Every release has a new version in `plugin/.claude-plugin/plugin.json`. Claude Code ignores new commits under an unchanged version, so a change with no bump never reaches anyone. The Build line under each heading is written by `npm run build:plugin`.
 
+## 0.10.3 - 2026-10-11
+
+Build: dist sha256 31a369ed167a2fb769a5ad2abf75fb37e5146fa628ed508ed4413a30cd3e46b8; skills sha256 e426573b9ef142b3abe263f55a38b99d8c5d2a0112ca77ac628738a17f546fa5
+
+Find Your Roots now asks the agent that finds your roots to read the calls you chose whole before it names anything: at least 12 of them, or all of them when you chose fewer. A finding can now say where it stops as well as when it happens. It is also asked to word what a finding says about why you do something as a reading of what you did that you can reject, not as a fact. You can turn on search by meaning in Settings so it also finds moments that use different words. Settings also lets you say who the people in your calls are, the words you use, and each call's kind. Calls open whole with their speakers beside them, and findings show as cards. Two optional layers, To-Dos and Insights, read the calls you choose on your own Claude plan. A framework seen in fewer than 2 calls shows as Emerging.
+
+When you ask your AI tools to write like you, they are told to start from what you asked, use only the findings that fit it, and never add a promise or a condition because a finding fits you. When no finding fits the topic, they get no findings, only samples of your words alongside your Foundation and the writing guidance.
+
+An older version is told to update before Find Your Roots runs.
+
 ## 0.10.2 - 2026-10-08
 
 Build: dist sha256 9d26c9081f79f8ed1f719d1ef2b0f08f0ecbe6576668e5bfd065500f5cc054b5; skills sha256 206d0c6c0519aea2758ca56f3d69836b66eeec74eac555f4eeb23f6d936cfd94

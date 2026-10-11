@@ -7,7 +7,7 @@ description: Set up a person's CF workspace with a short conversation about thei
 
 A conversation of about 15 minutes. It sets up the person's workspace around what they are working toward, so Home, the Make ideas, and their agents aim at it. It does not decide anything about how they think. Their calls do that.
 
-Version: `cf-starting-point@0.3.0`. Wording approved by Max, 2026-10-01; question 9 reworded with his yes, 2026-10-02, after it did not land in his test run; question 3 reworded by Max, 2026-10-03, to say why it asks. The save mechanics are in What You Write.
+Version: `cf-starting-point@0.3.1`. Wording approved by Max, 2026-10-01; question 9 reworded with his yes, 2026-10-02, after it did not land in his test run; question 3 reworded by Max, 2026-10-03, to say why it asks. Questions 3 and 9 reworded 2026-10-10 so each says only what the app does with the answer; Max has not seen this wording yet. The save mechanics are in What You Write.
 
 ## How to Talk
 
@@ -39,7 +39,7 @@ Ask them in this order. Each one says what to ask, what to push for, and where t
 2. **The business you're really in.** "Set the job title and the offer aside. What business are you really in? What do people actually come to you for?"
    If the answer repeats question 1, ask "and really?" one more time. Goes to: In Their Words.
 
-3. **The result.** "What results do you want in your business or your life over the next 90 days? Your answer sets up your system to help you get there."
+3. **The result.** "What results do you want in your business or your life over the next 90 days? Your drafts and your agents aim at your answer."
    If they name an activity ("post more", "understand my thinking better"), ask what that would get them. Land on one result they could point to. Goes to: Goals.
 
 4. **Why it has to happen.** "Why does that have to happen? What changes if it does, and what happens if it doesn't?"
@@ -57,8 +57,8 @@ Ask them in this order. Each one says what to ask, what to push for, and where t
 8. **Your gift.** "What's your main gift, the thing people come to you for that they don't get elsewhere? How do you know?"
    Push for the "how do you know": a moment someone noticed it, a client's words, a result. Goes to: In Their Words.
 
-9. **After your last call.** "Think about your last important call. Right after it ended, what do you wish you'd had in hand? Your answer sets what your dashboard shows you first after each call. For example: a drafted follow-up, a list of what you promised, or the one thing to act on."
-   Ask it as written, examples included. Their own words beat the examples. Goes to: Setup Notes (what Home and Make show first).
+9. **After your last call.** "Think about your last important call. Right after it ended, what do you wish you'd had in hand? For example: a drafted follow-up, a list of what you promised, or the one thing to act on. Your agents read your answer, so they know what to have ready for you after a call."
+   Ask it as written, examples included. Their own words beat the examples. Goes to: Setup Notes (their agents read it).
 
 10. **What you're not seeing.** "Last one. What do you think you might not be seeing in your business right now?"
     Then say: "That's what your calls are for." Then ask: "Which calls do you have recorded? Granola, Zoom, Otter, anything. You'll add 3 to 5 of them in your dashboard in a minute." Goes to: In Their Words, and Starting Calls.
@@ -144,6 +144,6 @@ Either way, nothing reaches agents until the person reads the draft in the dashb
 
 "Your starting point is ready. Open your dashboard to read it, fix anything, and save it. Then add your first calls."
 
-If you can run commands, offer to open the dashboard now: run `node ${CLAUDE_PLUGIN_ROOT}/dist/cf.mjs open "${user_config.cf_folder}"`. Otherwise tell them to open their dashboard. Either way, tell them to look for the Starting Point screen in the left rail.
+If you can run commands, offer to open the dashboard now: run `node ${CLAUDE_PLUGIN_ROOT}/dist/cf.mjs open "${user_config.cf_folder}"`. Otherwise tell them to open their dashboard. Either way, tell them to look for Your Foundation in the left rail.
 
 To update later, the person says "update my starting point." Ask only the questions whose answers changed, starting with 3, 5, and 7.
