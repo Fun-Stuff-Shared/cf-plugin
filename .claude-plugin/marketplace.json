@@ -1,14 +1,8 @@
 {
   "name": "cognitive-fingerprint",
-  "description": "The Cognitive Fingerprint plugin marketplace.",
+  "description": "Retired. Use the Cognitive Fingerprint app: github.com/Fun-Stuff-Shared/cf-mac",
   "owner": {
     "name": "Cognitive Fingerprint"
   },
-  "plugins": [
-    {
-      "name": "cflab",
-      "source": "./plugin",
-      "description": "Cognitive Fingerprint: your own CF folder, a private dashboard, the deep roots of how you think, and read-only agent access."
-    }
-  ]
+  "plugins": []
 }
